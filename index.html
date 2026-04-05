@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PepGuide — Research Peptide Stack Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #1D9E75; --teal-light: #E1F5EE; --teal-mid: #5DCAA5;
+      --teal-dark: #0F6E56; --teal-deep: #085041;
+      --amber-light: #FAEEDA; --red: #A32D2D; --red-light: #FCEBEB;
+      --blue-light: #E6F1FB; --blue-deep: #042C53;
+      --g50: #F8F8F6; --g100: #F0EFEA; --g200: #E0DFD8;
+      --g400: #9B9A94; --g600: #5F5E5A; --g800: #2C2C2A;
+      --text: #1A1A18; --text2: #5F5E5A; --text3: #9B9A94;
+      --border: rgba(0,0,0,0.10); --border2: rgba(0,0,0,0.18);
+      --r: 10px; --rl: 14px;
+    }
+    html { font-size: 15px; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--g50); color: var(--text); min-height: 100vh; }
+
+    /* Layout */
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 210px; flex-shrink: 0; background: #fff;
+      border-right: 0.5px solid var(--border); display: flex;
+      flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 10;
+    }
+    .sidebar-logo { padding: 22px 18px 14px; border-bottom: 0.5px solid var(--border); }
+    .logo-mark { font-size: 20px; font-weight: 600; letter-spacing: -0.5px; }
+    .logo-mark span { color: var(--teal); }
+    .logo-tag { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .sidebar-nav { padding: 10px 8px; flex: 1; }
+    .nav-item {
+      display: flex; align-items: center; gap: 9px; padding: 9px 11px;
+      border-radius: var(--r); font-size: 13px; font-weight: 500;
+      color: var(--text2); cursor: pointer; transition: all 0.15s; margin-bottom: 2px;
+    }
+    .nav-item:hover { background: var(--g100); color: var(--text); }
+    .nav-item.active { background: var(--teal-light); color: var(--teal-deep); }
+    .nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+    .sidebar-footer { padding: 14px 18px; border-top: 0.5px solid var(--border); font-size: 11px; color: var(--text3); line-height: 1.5; }
+
+    .main { margin-left: 210px; flex: 1; }
+    .page-header { background: #fff; border-bottom: 0.5px solid var(--border); padding: 18px 28px; }
+    .page-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+    .page-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .content { padding: 24px 28px; max-width: 900px; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Cards */
+    .card { background: #fff; border: 0.5px solid var(--border); border-radius: var(--rl); overflow: hidden; margin-bottom: 14px; }
+    .card-head { padding: 13px 17px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .card-title { font-size: 13px; font-weight: 600; }
+    .card-body { padding: 17px; }
+
+    .slabel { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.7px; color: var(--text3); margin-bottom: 8px; }
+
+    /* Chips */
+    .chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 7px; margin-bottom: 16px; }
+    .chip {
+      border: 0.5px solid var(--border2); border-radius: var(--r); padding: 9px 11px;
+      cursor: pointer; font-size: 13px; color: var(--text2); background: #fff;
+      transition: all 0.15s; display: flex; align-items: center; gap: 7px; user-select: none;
+    }
+    .chip:hover { border-color: var(--teal-mid); }
+    .chip.on { border-color: var(--teal); background: var(--teal-light); color: var(--teal-deep); font-weight: 500; }
+    .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal-mid); flex-shrink: 0; opacity: 0; transition: opacity 0.15s; }
+    .chip.on .chip-dot { opacity: 1; }
+
+    /* Pills */
+    .pill-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
+    .pill {
+      border: 0.5px solid var(--border2); border-radius: 100px; padding: 5px 13px;
+      font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text2); background: #fff; transition: all 0.15s;
+    }
+    .pill.on { border-color: var(--teal); background: var(--teal-light); color: var(--teal-deep); }
+
+    /* Inputs */
+    input[type=text], input[type=number], textarea, select {
+      width: 100%; padding: 9px 11px; font-size: 13px; font-family: inherit;
+      border: 0.5px solid var(--border2); border-radius: var(--r);
+      background: #fff; color: var(--text); outline: none; transition: border-color 0.15s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(29,158,117,0.08); }
+    textarea { resize: vertical; min-height: 68px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-bottom: 16px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); }
+    .field-group { margin-bottom: 16px; }
+
+    /* Buttons */
+    .btn { padding: 10px 18px; font-size: 13px; font-weight: 600; border-radius: var(--r); cursor: pointer; transition: all 0.15s; border: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary { background: var(--teal); color: #fff; }
+    .btn-primary:hover { background: var(--teal-dark); }
+    .btn-primary:disabled { background: var(--g200); color: var(--text3); cursor: not-allowed; }
+    .btn-outline { background: #fff; color: var(--text2); border: 0.5px solid var(--border2); }
+    .btn-outline:hover { border-color: var(--teal); color: var(--teal-dark); }
+    .btn-full { width: 100%; justify-content: center; }
+    .btn-sm { padding: 6px 13px; font-size: 12px; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 100px; }
+    .badge-teal { background: var(--teal-light); color: var(--teal-deep); }
+    .badge-amber { background: var(--amber-light); color: #633806; }
+    .badge-red { background: var(--red-light); color: var(--red); }
+    .badge-gray { background: var(--g100); color: var(--g600); }
+
+    /* Result */
+    .result-text { font-size: 13px; line-height: 1.85; white-space: pre-wrap; color: var(--text); font-family: 'DM Mono', monospace; }
+    .result-text.loading { color: var(--text3); font-style: italic; font-family: inherit; }
+
+    /* Alert boxes */
+    .conflict-box { background: var(--red-light); border: 0.5px solid #F09595; border-radius: var(--r); padding: 12px 14px; font-size: 13px; color: #4A1B0C; margin-top: 11px; line-height: 1.6; }
+    .synergy-box { background: var(--amber-light); border: 0.5px solid #FAC775; border-radius: var(--r); padding: 12px 14px; font-size: 13px; color: #412402; margin-top: 11px; line-height: 1.6; }
+
+    /* Calculator */
+    .calc-result-card { background: var(--teal-light); border: 0.5px solid var(--teal-mid); border-radius: var(--rl); padding: 20px 22px; margin-bottom: 16px; }
+    .calc-big { font-size: 34px; font-weight: 600; color: var(--teal-dark); line-height: 1; }
+    .calc-label { font-size: 13px; color: var(--teal-dark); margin-top: 4px; }
+    .calc-sub { font-size: 12px; color: var(--teal-deep); margin-top: 2px; opacity: 0.7; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-bottom: 16px; }
+    .stat-card { background: var(--g100); border-radius: var(--r); padding: 12px 14px; }
+    .stat-num { font-size: 20px; font-weight: 600; }
+    .stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+    /* Timeline */
+    .tl-legend { display: flex; gap: 14px; margin-bottom: 11px; }
+    .tl-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+    .tl-dot { width: 10px; height: 10px; border-radius: 2px; }
+    .week-row { display: flex; align-items: center; gap: 9px; margin-bottom: 5px; }
+    .week-label { font-size: 11px; color: var(--text3); width: 42px; flex-shrink: 0; }
+    .week-bar { height: 22px; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: 11px; font-weight: 500; min-width: 50px; }
+    .bar-on { background: var(--teal-light); color: var(--teal-deep); border: 0.5px solid var(--teal-mid); }
+    .bar-off { background: var(--g100); color: var(--text3); }
+    .week-note { font-size: 11px; color: var(--text3); }
+
+    /* Compare */
+    .compare-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); gap: 10px; margin-top: 12px; }
+    .compare-card { border: 0.5px solid var(--border); border-radius: var(--rl); padding: 14px; background: #fff; }
+    .compare-card.featured { border: 1.5px solid var(--teal); }
+    .compare-card-name { font-size: 14px; font-weight: 600; margin-bottom: 9px; }
+    .compare-row { display: flex; justify-content: space-between; align-items: flex-start; font-size: 12px; padding: 5px 0; border-bottom: 0.5px solid var(--border); gap: 7px; }
+    .compare-row:last-child { border: none; }
+    .ckey { color: var(--text3); flex-shrink: 0; }
+    .cval { text-align: right; font-weight: 500; font-size: 11px; }
+    .score-bar { height: 4px; border-radius: 2px; background: var(--g200); margin-top: 5px; }
+    .score-fill { height: 100%; border-radius: 2px; background: var(--teal); }
+
+    /* DB table */
+    .db-search-row { display: flex; gap: 9px; margin-bottom: 14px; }
+    .pep-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .pep-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); padding: 8px 11px; border-bottom: 0.5px solid var(--border); text-align: left; }
+    .pep-table td { padding: 9px 11px; border-bottom: 0.5px solid var(--border); vertical-align: top; }
+    .pep-table tr:hover td { background: var(--g50); }
+    .pep-table tr:last-child td { border-bottom: none; }
+    .pep-name { font-weight: 600; font-size: 13px; }
+    .pep-alias { font-size: 10px; color: var(--text3); }
+    .cat-pill { font-size: 10px; padding: 2px 7px; border-radius: 100px; font-weight: 600; display: inline-block; }
+
+    /* History */
+    .hist-item { border: 0.5px solid var(--border); border-radius: var(--r); padding: 13px 15px; margin-bottom: 7px; cursor: pointer; transition: border-color 0.15s; background: #fff; }
+    .hist-item:hover { border-color: var(--teal); }
+    .hist-goals { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+    .hist-meta { font-size: 11px; color: var(--text3); display: flex; gap: 10px; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text3); font-size: 13px; }
+    .empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+    .action-row { display: flex; gap: 7px; justify-content: flex-end; padding: 12px 17px; border-top: 0.5px solid var(--border); }
+    .disclaimer { font-size: 11px; color: var(--text3); line-height: 1.6; margin-top: 24px; padding-top: 14px; border-top: 0.5px solid var(--border); }
+
+    .toast { position: fixed; bottom: 22px; right: 22px; background: var(--g800); color: #fff; padding: 11px 18px; border-radius: var(--r); font-size: 13px; font-weight: 500; z-index: 999; animation: slideUp 0.2s ease; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+    @media (max-width: 700px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .content { padding: 14px; }
+      .row2 { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">Pep<span>Guide</span></div>
+      <div class="logo-tag">Research stack generator</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-item active" onclick="showPanel('generator')"><span class="nav-icon">⚗️</span>Stack generator</div>
+      <div class="nav-item" onclick="showPanel('calculator')"><span class="nav-icon">🧮</span>Dosing calculator</div>
+      <div class="nav-item" onclick="showPanel('compare')"><span class="nav-icon">⚖️</span>Compare peptides</div>
+      <div class="nav-item" onclick="showPanel('database')"><span class="nav-icon">🗄️</span>Peptide database</div>
+      <div class="nav-item" onclick="showPanel('history')"><span class="nav-icon">📋</span>Saved stacks</div>
+    </div>
+    <div class="sidebar-footer">Research use only.<br>Not medical advice.<br>Consult a physician.</div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="page-header">
+      <div class="page-title" id="pageTitle">Stack generator</div>
+      <div class="page-sub" id="pageSub">Select goals → generate a personalized research peptide stack</div>
+    </div>
+    <div class="content">
+
+      <!-- GENERATOR -->
+      <div class="panel active" id="panel-generator">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Goals & profile</div></div>
+          <div class="card-body">
+            <div class="slabel">Primary goals</div>
+            <div class="chip-grid" id="goalGrid"></div>
+            <div class="slabel">Experience level</div>
+            <div class="pill-row" id="expPills">
+              <div class="pill on" data-e="beginner">Beginner</div>
+              <div class="pill" data-e="intermediate">Intermediate</div>
+              <div class="pill" data-e="advanced">Advanced</div>
+            </div>
+            <div class="row2">
+              <div class="field"><label>Age</label><input type="number" id="age" placeholder="e.g. 38" min="18" max="90"/></div>
+              <div class="field"><label>Biological sex</label>
+                <select id="sex"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option></select>
+              </div>
+            </div>
+            <div class="field field-group"><label>Additional context</label>
+              <textarea id="extra" placeholder="e.g. 185 lbs, training 5x/week, recovering from rotator cuff injury, no prior peptide use..."></textarea>
+            </div>
+            <button class="btn btn-primary btn-full" id="genBtn" onclick="generate()">Generate my peptide stack</button>
+          </div>
+        </div>
+        <div class="card" id="resultCard" style="display:none;">
+          <div class="card-head">
+            <div class="card-title">Suggested research stack</div>
+            <div style="display:flex;gap:6px;" id="resultBadges"><span class="badge badge-teal">Research only</span></div>
+          </div>
+          <div class="card-body">
+            <div class="result-text loading" id="resultBody">Analyzing your goals...</div>
+            <div id="conflictSection"></div>
+            <div id="synergySection"></div>
+          </div>
+          <div class="action-row">
+            <button class="btn btn-outline btn-sm" onclick="saveStack()">💾 Save stack</button>
+            <button class="btn btn-outline btn-sm" onclick="exportPDF()">📄 Export PDF</button>
+          </div>
+        </div>
+        <div class="disclaimer">PepGuide is for educational and research purposes only. Peptides listed are research chemicals not approved by the FDA for human use. This is not medical advice. Always consult a qualified healthcare provider. Never self-administer research chemicals.</div>
+      </div>
+
+      <!-- CALCULATOR -->
+      <div class="panel" id="panel-calculator">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Reconstitution & dosing calculator</div></div>
+          <div class="card-body">
+            <div class="row2">
+              <div class="field"><label>Vial size (mg)</label><input type="number" id="vialMg" placeholder="e.g. 5" oninput="calcDose()"/></div>
+              <div class="field"><label>Bacteriostatic water added (ml)</label><input type="number" id="bactWater" placeholder="e.g. 2" oninput="calcDose()"/></div>
+            </div>
+            <div class="row2">
+              <div class="field"><label>Desired dose (mcg)</label><input type="number" id="desiredMcg" placeholder="e.g. 300" oninput="calcDose()"/></div>
+              <div class="field"><label>Syringe type</label>
+                <select id="syringeType" onchange="calcDose()">
+                  <option value="100">U-100 insulin syringe</option>
+                  <option value="50">U-50 insulin syringe</option>
+                  <option value="direct">Standard syringe (ml)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="calc-result-card">
+          <div class="calc-big" id="calcNum">—</div>
+          <div class="calc-label" id="calcLabel">Enter values above to calculate</div>
+          <div class="calc-sub" id="calcSub"></div>
+        </div>
+        <div class="summary-grid" id="summaryGrid" style="display:none;">
+          <div class="stat-card"><div class="stat-num" id="s1">—</div><div class="stat-label">mcg per ml</div></div>
+          <div class="stat-card"><div class="stat-num" id="s2">—</div><div class="stat-label">mcg per U-100 unit</div></div>
+          <div class="stat-card"><div class="stat-num" id="s3">—</div><div class="stat-label">doses remaining</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Protocol timeline</div></div>
+          <div class="card-body">
+            <div class="slabel">Cycle length</div>
+            <div class="pill-row" id="cyclePills">
+              <div class="pill on" data-c="4">4 weeks</div>
+              <div class="pill" data-c="8">8 weeks</div>
+              <div class="pill" data-c="12">12 weeks</div>
+              <div class="pill" data-c="16">16 weeks</div>
+            </div>
+            <div class="slabel">Dosing pattern</div>
+            <div class="pill-row" id="patternPills">
+              <div class="pill on" data-p="5on2off">5 on / 2 off</div>
+              <div class="pill" data-p="daily">Daily</div>
+              <div class="pill" data-p="eod">Every other day</div>
+              <div class="pill" data-p="2on5off">2 on / 5 off</div>
+              <div class="pill" data-p="3wk">3x per week</div>
+            </div>
+            <div id="timeline"></div>
+          </div>
+        </div>
+        <div class="disclaimer">Always use bacteriostatic water for multi-use vials. Reconstituted peptides stored at 2–8°C are generally stable for 28–30 days. Lyophilized peptides at −20°C are stable for 1–2 years.</div>
+      </div>
+
+      <!-- COMPARE -->
+      <div class="panel" id="panel-compare">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Select peptides to compare</div><span class="badge badge-gray" id="cmpCount">0 selected</span></div>
+          <div class="card-body">
+            <div class="chip-grid" id="compareChips"></div>
+            <button class="btn btn-primary" onclick="runCompare()">Compare selected</button>
+          </div>
+        </div>
+        <div id="compareResults"></div>
+      </div>
+
+      <!-- DATABASE -->
+      <div class="panel" id="panel-database">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Peptide reference database</div><span class="badge badge-teal" id="dbCount"></span></div>
+          <div class="card-body" style="padding-bottom:0;">
+            <div class="db-search-row">
+              <input type="text" id="dbSearch" placeholder="Search by name, category, use case..." oninput="renderDB()"/>
+              <select id="dbCat" onchange="renderDB()" style="width:180px;">
+                <option value="">All categories</option>
+              </select>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="pep-table">
+              <thead><tr><th>Peptide</th><th>Category</th><th>Route</th><th>Research dose</th><th>Best for</th><th>Storage</th></tr></thead>
+              <tbody id="dbBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="panel" id="panel-history">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Saved stacks</div><button class="btn btn-outline btn-sm" onclick="clearHistory()">Clear all</button></div>
+          <div class="card-body" id="historyList"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Peptide Database ──
+const PEPTIDES = {
+  'BPC-157':      { alias:'Body Protection Compound', cat:'Healing', catBg:'#E1F5EE', catTxt:'#085041', route:'SubQ / IM / Oral', dose:'250–500 mcg/day', freq:'Once or twice daily', half:'~4h', cycle:'4–12 weeks', storage:'−20°C lyophilized', synergy:['TB-500','GHK-Cu'], bestFor:['Injury healing','Recovery','Anti-inflammation','Gut health'], eff:9, safe:9, notes:'Most studied healing peptide. Oral use benefits gut directly.' },
+  'TB-500':       { alias:'Thymosin Beta-4', cat:'Healing', catBg:'#E1F5EE', catTxt:'#085041', route:'SubQ / IM', dose:'2–2.5 mg 2x/week loading; 1 mg/week maintenance', freq:'Twice weekly', half:'Long-acting', cycle:'4–6 weeks loading + maintenance', storage:'−20°C lyophilized', synergy:['BPC-157','GHK-Cu'], bestFor:['Recovery','Injury healing','Anti-inflammation','Endurance'], eff:8, safe:8, notes:'Works systemically — great for athletes with multiple injury sites.' },
+  'GHK-Cu':       { alias:'Copper Peptide', cat:'Healing', catBg:'#E1F5EE', catTxt:'#085041', route:'SubQ / Topical', dose:'1–2 mg/day', freq:'Daily', half:'Unknown', cycle:'4–8 weeks', storage:'−20°C', synergy:['BPC-157','TB-500'], bestFor:['Longevity','Anti-inflammation','Recovery'], eff:7, safe:9, notes:'Strong anti-aging and collagen profile. Also used topically for skin.' },
+  'KPV':          { alias:'Lysine-Proline-Valine', cat:'Healing', catBg:'#E1F5EE', catTxt:'#085041', route:'Oral / SubQ', dose:'100–500 mcg/day', freq:'Daily', half:'Short', cycle:'4–8 weeks', storage:'−20°C', synergy:['BPC-157'], bestFor:['Anti-inflammation','Gut health','Recovery'], eff:7, safe:9, notes:'Excellent for gut inflammation. Often combined with BPC-157.' },
+  'CJC-1295':     { alias:'CJC-1295 DAC', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ', dose:'1–2 mg/week', freq:'Once weekly', half:'~6–8 days', cycle:'8–12 weeks', storage:'−20°C lyophilized', synergy:['Ipamorelin','GHRP-6'], bestFor:['Muscle growth','Fat loss','Recovery','Sleep quality'], eff:9, safe:8, notes:'Pair with a GHRP for synergistic GH release.', contraWith:['MK-677'] },
+  'Ipamorelin':   { alias:'Ipamorelin', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ', dose:'200–300 mcg/dose', freq:'2–3x daily fasted or pre-sleep', half:'~2h', cycle:'8–12 weeks', storage:'−20°C lyophilized', synergy:['CJC-1295','Sermorelin'], bestFor:['Muscle growth','Fat loss','Sleep quality','Recovery'], eff:8, safe:9, notes:'Cleanest GHRP — minimal cortisol/prolactin elevation. Best dosed pre-sleep.' },
+  'Sermorelin':   { alias:'GRF 1-29', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ', dose:'200–500 mcg/day', freq:'Once daily pre-sleep', half:'~10–20 min', cycle:'3–6 months', storage:'−20°C', synergy:['Ipamorelin'], bestFor:['Muscle growth','Fat loss','Sleep quality','Longevity'], eff:7, safe:9, notes:'Gentle GH stimulation. Good for older users or first-timers.' },
+  'GHRP-6':       { alias:'Growth Hormone Releasing Peptide-6', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ / IM', dose:'100–300 mcg/dose', freq:'2–3x daily fasted', half:'~15–60 min', cycle:'8–12 weeks', storage:'−20°C', synergy:['CJC-1295'], bestFor:['Muscle growth','Recovery','Appetite'], eff:8, safe:7, notes:'Causes significant hunger — ideal for mass gaining, less so for fat loss.' },
+  'GHRP-2':       { alias:'Growth Hormone Releasing Peptide-2', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ', dose:'100–300 mcg/dose', freq:'2–3x daily', half:'~30 min', cycle:'8–12 weeks', storage:'−20°C', synergy:['CJC-1295'], bestFor:['Muscle growth','Fat loss','Recovery'], eff:8, safe:7, notes:'More potent than GHRP-6 with less hunger but more cortisol elevation.' },
+  'MK-677':       { alias:'Ibutamoren / Nutrobal', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'Oral', dose:'10–25 mg/day', freq:'Once daily pre-sleep', half:'~24h', cycle:'3–6 months', storage:'Room temp', synergy:['Ipamorelin'], bestFor:['Muscle growth','Sleep quality','Recovery','Longevity'], eff:9, safe:7, notes:'Oral convenience advantage. Can cause water retention and appetite increase.', contraWith:['CJC-1295'] },
+  'AOD-9604':     { alias:'Anti-Obesity Drug 9604', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ', dose:'250–500 mcg/day', freq:'Once daily fasted AM', half:'Unknown', cycle:'12–16 weeks', storage:'−20°C', synergy:['Ipamorelin'], bestFor:['Fat loss'], eff:7, safe:9, notes:'Targeted fat-loss only — no anabolic effects. Cleaner than full GH.', contraWith:['CJC-1295'] },
+  'Semaglutide':  { alias:'Ozempic / Wegovy analogue', cat:'Metabolic', catBg:'#FAEEDA', catTxt:'#412402', route:'SubQ', dose:'0.25 mg/week → titrate to 2.4 mg/week', freq:'Once weekly', half:'~7 days', cycle:'Ongoing', storage:'2–8°C refrigerated', synergy:[], bestFor:['Fat loss','Metabolic health','Longevity'], eff:10, safe:7, notes:'Most validated weight-loss peptide. GI side effects common during titration.', contraWith:['Retatrutide','Tirzepatide'] },
+  'Tirzepatide':  { alias:'Mounjaro analogue', cat:'Metabolic', catBg:'#FAEEDA', catTxt:'#412402', route:'SubQ', dose:'2.5 mg/week → titrate to 15 mg/week', freq:'Once weekly', half:'~5 days', cycle:'Ongoing', storage:'2–8°C refrigerated', synergy:[], bestFor:['Fat loss','Metabolic health'], eff:10, safe:7, notes:'Dual GIP/GLP-1 agonist. Outperforms semaglutide for weight loss in trials.', contraWith:['Semaglutide','Retatrutide'] },
+  'Retatrutide':  { alias:'Triple agonist LY3437943', cat:'Metabolic', catBg:'#FAEEDA', catTxt:'#412402', route:'SubQ', dose:'1 mg/week → titrate to 12 mg/week', freq:'Once weekly', half:'~6 days', cycle:'Ongoing', storage:'2–8°C refrigerated', synergy:[], bestFor:['Fat loss','Metabolic health','Longevity'], eff:10, safe:6, notes:'Most potent metabolic peptide in research. ~24% weight loss in Phase 3.', contraWith:['Semaglutide','Tirzepatide'] },
+  'MOTS-c':       { alias:'Mitochondrial peptide MOTS-c', cat:'Metabolic', catBg:'#FAEEDA', catTxt:'#412402', route:'SubQ / IM', dose:'5–10 mg/week', freq:'2–3x weekly', half:'Unknown', cycle:'4–8 weeks', storage:'−20°C', synergy:['Humanin','SS-31'], bestFor:['Fat loss','Endurance','Longevity','Metabolic health'], eff:8, safe:8, notes:'Exercise-mimetic. Activates AMPK, improves insulin sensitivity.' },
+  'Humanin':      { alias:'Humanin (HN)', cat:'Metabolic', catBg:'#FAEEDA', catTxt:'#412402', route:'SubQ', dose:'2–4 mg/week', freq:'2–3x weekly', half:'Unknown', cycle:'4–8 weeks', storage:'−20°C', synergy:['MOTS-c'], bestFor:['Longevity','Cognitive performance','Metabolic health'], eff:7, safe:8, notes:'Mitochondria-derived. Cytoprotective and neuroprotective. Declines with age.' },
+  'Semax':        { alias:'ACTH(4-7)-Pro-Gly-Pro', cat:'Cognitive', catBg:'#EEEDFE', catTxt:'#26215C', route:'Intranasal / SubQ', dose:'200–600 mcg/day', freq:'Once or twice daily', half:'~minutes', cycle:'2–4 weeks on / 2 off', storage:'−20°C; 2–8°C reconstituted 2 weeks', synergy:['Selank','Dihexa'], bestFor:['Cognitive performance','Focus','Neuroprotection','Recovery'], eff:9, safe:9, notes:'Well-studied Russian nootropic. Strong BDNF boost — great for learning and focus.' },
+  'Selank':       { alias:'Tuftsin analogue', cat:'Cognitive', catBg:'#EEEDFE', catTxt:'#26215C', route:'Intranasal', dose:'250–500 mcg/day', freq:'Once or twice daily', half:'~minutes', cycle:'2–4 weeks', storage:'2–8°C reconstituted', synergy:['Semax'], bestFor:['Cognitive performance','Sleep quality','Mood','Anti-anxiety'], eff:8, safe:10, notes:'One of the safest nootropic peptides. Pairs perfectly with Semax.' },
+  'Dihexa':       { alias:'PNB-0408', cat:'Cognitive', catBg:'#EEEDFE', catTxt:'#26215C', route:'Oral / Topical / SubQ', dose:'10–30 mg/week oral', freq:'2–3x weekly', half:'Unknown long-acting', cycle:'4–8 weeks', storage:'−20°C', synergy:['Semax'], bestFor:['Cognitive performance','Neuroprotection'], eff:9, safe:6, notes:'Extraordinarily potent neuroplasticity agent. Start very low. Limited human data.' },
+  'Cerebrolysin': { alias:'FPE 1070', cat:'Cognitive', catBg:'#EEEDFE', catTxt:'#26215C', route:'IM / IV', dose:'5–10 ml/day', freq:'Daily for 10–20 days', half:'Unknown', cycle:'10–20 day courses', storage:'2–8°C', synergy:['Semax','Selank'], bestFor:['Cognitive performance','Neuroprotection','Recovery'], eff:9, safe:7, notes:'Clinically used in Europe for stroke/Alzheimer\'s. IV administration preferred.' },
+  'P21':          { alias:'CNTF analogue', cat:'Cognitive', catBg:'#EEEDFE', catTxt:'#26215C', route:'Intranasal / SubQ', dose:'100–300 mcg/day', freq:'Daily', half:'Unknown', cycle:'4–6 weeks', storage:'−20°C', synergy:['Semax'], bestFor:['Cognitive performance','Neuroprotection'], eff:7, safe:7, notes:'Emerging research only. Very limited human data — proceed with caution.' },
+  'Epithalon':    { alias:'Epitalon / Epithalone', cat:'Longevity', catBg:'#EAF3DE', catTxt:'#173404', route:'SubQ / IM / IV', dose:'5–10 mg/day', freq:'Daily for 10–20 days', half:'Unknown', cycle:'10–20 day courses 2–3x/year', storage:'−20°C lyophilized', synergy:['Thymalin','DSIP','Pinealon'], bestFor:['Longevity','Sleep quality','Anti-aging'], eff:9, safe:9, notes:'Decades of Russian longevity research. Telomerase activator. Most validated anti-aging peptide.' },
+  'Thymalin':     { alias:'Thymus peptide complex', cat:'Longevity', catBg:'#EAF3DE', catTxt:'#173404', route:'SubQ / IM', dose:'5–10 mg/day', freq:'Daily for 10 days', half:'Unknown', cycle:'10-day courses 1–2x/year', storage:'−20°C', synergy:['Epithalon'], bestFor:['Longevity','Immune support','Anti-aging'], eff:8, safe:9, notes:'Restores thymic function and immune competence. Strong longevity research alongside Epithalon.' },
+  'Pinealon':     { alias:'EDR tripeptide', cat:'Longevity', catBg:'#EAF3DE', catTxt:'#173404', route:'Intranasal / SubQ', dose:'5–10 mg/day', freq:'Daily for 10 days', half:'Unknown', cycle:'10-day courses 2–3x/year', storage:'−20°C', synergy:['Epithalon'], bestFor:['Longevity','Cognitive performance','Sleep quality'], eff:7, safe:8, notes:'Pineal gland peptide. Pairs naturally with Epithalon for longevity protocols.' },
+  'SS-31':        { alias:'Elamipretide / MTP-131', cat:'Longevity', catBg:'#EAF3DE', catTxt:'#173404', route:'SubQ / IV', dose:'0.05–0.25 mg/kg/day', freq:'Daily', half:'Unknown', cycle:'4–8 weeks', storage:'−20°C', synergy:['MOTS-c'], bestFor:['Endurance','Recovery','Longevity'], eff:8, safe:8, notes:'Mitochondrial medicine targeting cardiolipin. Restores ATP and reduces oxidative stress.' },
+  'DSIP':         { alias:'Delta Sleep-Inducing Peptide', cat:'Sleep', catBg:'#EAF3DE', catTxt:'#173404', route:'SubQ / IV', dose:'100–300 mcg/night', freq:'As needed pre-sleep', half:'~30–60 min', cycle:'2–4 weeks as needed', storage:'−20°C', synergy:['Epithalon','Selank'], bestFor:['Sleep quality','Recovery','Stress reduction'], eff:7, safe:9, notes:'Non-habit forming. Great for stress-related insomnia.' },
+  'PT-141':       { alias:'Bremelanotide', cat:'Sexual Health', catBg:'#FBEAF0', catTxt:'#4B1528', route:'SubQ / Intranasal', dose:'0.5–2 mg as needed', freq:'As needed 1–2h pre-activity', half:'~6–8h', cycle:'Max 2x weekly', storage:'−20°C lyophilized', synergy:['Kisspeptin-10'], bestFor:['Libido / hormonal health','Sexual function'], eff:9, safe:7, notes:'FDA-approved for female HSDD. Start at 0.5 mg — nausea common at higher doses.' },
+  'Kisspeptin-10':{ alias:'Metastin 10-19', cat:'Sexual Health', catBg:'#FBEAF0', catTxt:'#4B1528', route:'SubQ / IV', dose:'1–10 mcg/kg', freq:'As needed or pulsatile', half:'~minutes', cycle:'4–8 week protocols', storage:'−20°C', synergy:['PT-141'], bestFor:['Libido / hormonal health','Hormonal optimization'], eff:8, safe:8, notes:'Triggers pulsatile LH/FSH release. Powerful hormonal axis stimulator.' },
+  'AICAR':        { alias:'AMPK activator AICAR', cat:'Performance', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ / IM', dose:'50–100 mg/day', freq:'Daily', half:'~2–3h', cycle:'4–8 weeks', storage:'−20°C', synergy:['MOTS-c'], bestFor:['Endurance','Fat loss','Metabolic health'], eff:8, safe:7, notes:'WADA-banned. Mimics exercise — increases mitochondrial biogenesis and fat oxidation.' },
+  'VIP':          { alias:'Vasoactive Intestinal Peptide', cat:'Immune', catBg:'#EAF3DE', catTxt:'#173404', route:'Intranasal / SubQ', dose:'25–50 mcg 2x daily intranasal', freq:'Twice daily', half:'~2 min IV', cycle:'12 weeks', storage:'−20°C', synergy:['BPC-157'], bestFor:['Anti-inflammation','Longevity','Immune support'], eff:8, safe:7, notes:'Used in CIRS/mold illness protocols. Potent systemic anti-inflammatory.' },
+  'LL-37':        { alias:'Cathelicidin antimicrobial peptide', cat:'Immune', catBg:'#EAF3DE', catTxt:'#173404', route:'SubQ / Topical', dose:'100 mcg/day', freq:'Daily', half:'Unknown', cycle:'4–6 weeks', storage:'−20°C', synergy:['BPC-157'], bestFor:['Anti-inflammation','Immune support','Longevity'], eff:7, safe:7, notes:'Human cathelicidin. Broad-spectrum antimicrobial and immunomodulatory.' },
+};
+
+const CONFLICTS = {
+  'Retatrutide+Semaglutide': { sev:'high', msg:'Both are GLP-1 agonists — combining causes severe GI toxicity, hypoglycemia, and pancreatitis risk. Never combine.' },
+  'Retatrutide+Tirzepatide': { sev:'high', msg:'Both target GLP-1/GIP receptors. Dangerous additive effects. Never combine GLP-1 class agents.' },
+  'Semaglutide+Tirzepatide': { sev:'high', msg:'Both are GLP-1 agonists — severe GI side effects, hypoglycemia, and pancreatitis risk. Do not combine.' },
+  'CJC-1295+MK-677':         { sev:'moderate', msg:'Both significantly raise GH. Combining may cause excessive GH, insulin resistance, and water retention. Choose one or start at minimum doses.' },
+  'AOD-9604+CJC-1295':       { sev:'moderate', msg:'AOD-9604 is a GH fragment while CJC-1295 raises full GH. May cause excessive downstream signaling. Use with caution.' },
+  'GHRP-2+GHRP-6':           { sev:'moderate', msg:'Stacking two GHRPs elevates cortisol/prolactin without proportional GH benefit. Choose one GHRP and pair with a GHRH instead.' },
+  'Dihexa+Cerebrolysin':     { sev:'low', msg:'Both are potent neuroplasticity agents. May cause overstimulation of synaptic growth. Cycle carefully if stacking.' },
+  'AICAR+MOTS-c':            { sev:'low', msg:'Both activate AMPK. May cause excessive energy substrate depletion. Monitor energy levels carefully.' },
+};
+
+const SYNERGIES = [
+  { pair:['BPC-157','TB-500'], note:'Gold-standard healing stack — local + systemic repair.' },
+  { pair:['CJC-1295','Ipamorelin'], note:'Classic GHRH + GHRP for synergistic GH pulse.' },
+  { pair:['Semax','Selank'], note:'Balanced nootropic — BDNF boost with anxiolytic grounding.' },
+  { pair:['Epithalon','Thymalin'], note:'Russian longevity protocol targeting telomeres and immune function.' },
+  { pair:['MOTS-c','SS-31'], note:'Dual mitochondrial optimization — metabolic + structural.' },
+];
+
+const PAGE_META = {
+  generator:  { title:'Stack generator', sub:'Select goals → generate a personalized research peptide stack' },
+  calculator: { title:'Dosing calculator', sub:'Reconstitution math, syringe measurements & protocol timelines' },
+  compare:    { title:'Compare peptides', sub:'Side-by-side comparison with conflict and synergy detection' },
+  database:   { title:'Peptide database', sub:`${Object.keys(PEPTIDES).length} research peptides with full protocol data` },
+  history:    { title:'Saved stacks', sub:'Your previously generated and saved stacks' },
+};
+
+// ── State ──
+const state = {
+  goals: new Set(), exp: 'beginner', compareItems: new Set(),
+  cycle: '4', pattern: '5on2off', lastResult: '', lastGoals: '',
+  history: JSON.parse(localStorage.getItem('pg_h') || '[]'),
+};
+
+// ── Nav ──
+window.showPanel = function(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick')?.includes(id)) n.classList.add('active');
+  });
+  document.getElementById('pageTitle').textContent = PAGE_META[id].title;
+  document.getElementById('pageSub').textContent = PAGE_META[id].sub;
+  if (id === 'calculator') renderTimeline();
+  if (id === 'history') renderHistory();
+  if (id === 'database') renderDB();
+};
+
+// ── Goal chips ──
+const GOALS = ['Fat loss','Muscle growth','Recovery','Endurance','Cognitive performance','Sleep quality','Longevity','Libido / hormonal health','Anti-inflammation','Injury healing','Immune support','Metabolic health'];
+const gg = document.getElementById('goalGrid');
+GOALS.forEach(g => {
+  const el = document.createElement('div');
+  el.className = 'chip'; el.dataset.g = g;
+  el.innerHTML = `<div class="chip-dot"></div>${g}`;
+  el.onclick = () => { state.goals.has(g) ? (state.goals.delete(g), el.classList.remove('on')) : (state.goals.add(g), el.classList.add('on')); };
+  gg.appendChild(el);
+});
+
+document.querySelectorAll('#expPills .pill').forEach(p => {
+  p.onclick = () => { document.querySelectorAll('#expPills .pill').forEach(x=>x.classList.remove('on')); p.classList.add('on'); state.exp = p.dataset.e; };
+});
+
+// ── Compare chips ──
+const cc = document.getElementById('compareChips');
+Object.keys(PEPTIDES).forEach(name => {
+  const p = PEPTIDES[name];
+  const el = document.createElement('div');
+  el.className = 'chip';
+  el.innerHTML = `<div class="chip-dot"></div>${name}`;
+  el.onclick = () => {
+    state.compareItems.has(name) ? (state.compareItems.delete(name), el.classList.remove('on')) : (state.compareItems.add(name), el.classList.add('on'));
+    document.getElementById('cmpCount').textContent = `${state.compareItems.size} selected`;
+  };
+  cc.appendChild(el);
+});
+
+// ── DB category filter ──
+const cats = [...new Set(Object.values(PEPTIDES).map(p=>p.cat))];
+const catSel = document.getElementById('dbCat');
+cats.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; catSel.appendChild(o); });
+document.getElementById('dbCount').textContent = `${Object.keys(PEPTIDES).length} peptides`;
+
+// ── Cycle/pattern pills ──
+document.querySelectorAll('#cyclePills .pill').forEach(p => {
+  p.onclick = () => { document.querySelectorAll('#cyclePills .pill').forEach(x=>x.classList.remove('on')); p.classList.add('on'); state.cycle = p.dataset.c; renderTimeline(); };
+});
+document.querySelectorAll('#patternPills .pill').forEach(p => {
+  p.onclick = () => { document.querySelectorAll('#patternPills .pill').forEach(x=>x.classList.remove('on')); p.classList.add('on'); state.pattern = p.dataset.p; renderTimeline(); };
+});
+
+// ── Generate ──
+window.generate = async function() {
+  if (!state.goals.size) { toast('Select at least one goal'); return; }
+  const btn = document.getElementById('genBtn');
+  const card = document.getElementById('resultCard');
+  const body = document.getElementById('resultBody');
+  btn.disabled = true; btn.textContent = 'Generating...';
+  card.style.display = 'block';
+  body.className = 'result-text loading'; body.textContent = 'Analyzing your goals and composing a research stack...';
+  document.getElementById('conflictSection').innerHTML = '';
+  document.getElementById('synergySection').innerHTML = '';
+  document.getElementById('resultBadges').innerHTML = '<span class="badge badge-teal">Research only</span>';
+
+  const goals = [...state.goals].join(', ');
+  const age = document.getElementById('age').value;
+  const sex = document.getElementById('sex').value;
+  const extra = document.getElementById('extra').value.trim();
+  const pepList = Object.entries(PEPTIDES).map(([n,p])=>`${n} (${p.cat}): ${p.bestFor.join(', ')}`).join('\n');
+
+  const prompt = `You are PepGuide, an expert research peptide advisor (educational purposes only).
+
+AVAILABLE PEPTIDES:
+${pepList}
+
+USER PROFILE:
+- Goals: ${goals}
+- Experience: ${state.exp}
+${age?'- Age: '+age:''}${sex?'\n- Sex: '+sex:''}
+${extra?'- Context: '+extra:''}
+
+Generate a stack using ONLY peptides from the list above. Use this exact format:
+
+═══ RECOMMENDED STACK ═══
+For each peptide:
+▸ [NAME]
+  Purpose: [why it fits this user]
+  Research dose: [specific dose]
+  Timing: [when/how]
+  Cycle: [length and pattern]
+
+═══ PROTOCOL SYNERGIES ═══
+[2-3 sentences on how these peptides work together]
+
+═══ ADMINISTRATION NOTES ═══
+[Reconstitution, storage, injection tips, timing relative to food/sleep/exercise]
+
+═══ CONTRAINDICATIONS ═══
+[Any conflicts between these peptides, or: None identified.]
+
+═══ ${state.exp.toUpperCase()} USER GUIDANCE ═══
+[2-3 sentences for their experience level]`;
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    const text = data.content?.map(b => b.text||'').join('') || 'No response.';
+    body.className = 'result-text'; body.textContent = text;
+    state.lastResult = text; state.lastGoals = goals;
+
+    // Conflict detection
+    const contraMatch = text.match(/CONTRAINDICATIONS\s*═+\s*([\s\S]*?)(?:═══|$)/i);
+    if (contraMatch && contraMatch[1] && !contraMatch[1].toLowerCase().includes('none identified')) {
+      document.getElementById('conflictSection').innerHTML =
+        `<div class="conflict-box"><strong>⚠ Conflicts noted:</strong><br>${contraMatch[1].trim()}</div>`;
+      document.getElementById('resultBadges').innerHTML += '<span class="badge badge-amber" style="margin-left:6px;">⚠ Conflicts</span>';
+    }
+
+    // Synergy detection
+    const mentioned = Object.keys(PEPTIDES).filter(n => text.includes(n));
+    const hits = SYNERGIES.filter(s => s.pair.every(p => mentioned.includes(p)));
+    if (hits.length) {
+      document.getElementById('synergySection').innerHTML =
+        `<div class="synergy-box"><strong>✓ Synergy detected:</strong> ${hits.map(s=>s.note).join(' | ')}</div>`;
+    }
+  } catch(e) {
+    body.className = 'result-text';
+    body.textContent = 'Error: ' + (e.message || 'Could not connect. Check that your API key is set in Vercel environment variables.');
+  }
+  btn.disabled = false; btn.textContent = 'Generate my peptide stack';
+};
+
+// ── Save / History ──
+window.saveStack = function() {
+  if (!state.lastResult) { toast('Generate a stack first'); return; }
+  state.history.unshift({ id: Date.now(), goals: state.lastGoals, exp: state.exp, text: state.lastResult, date: new Date().toLocaleDateString() });
+  localStorage.setItem('pg_h', JSON.stringify(state.history.slice(0,20)));
+  toast('Stack saved ✓');
+};
+
+window.clearHistory = function() {
+  if (!confirm('Clear all saved stacks?')) return;
+  state.history.length = 0; localStorage.removeItem('pg_h'); renderHistory();
+};
+
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (!state.history.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div>No saved stacks yet.</div>'; return; }
+  el.innerHTML = state.history.map((h,i) => `<div class="hist-item" onclick="loadHistory(${i})"><div class="hist-goals">${h.goals}</div><div class="hist-meta"><span>${h.exp}</span><span>${h.date}</span></div></div>`).join('');
+}
+
+window.loadHistory = function(i) {
+  showPanel('generator');
+  document.getElementById('resultCard').style.display = 'block';
+  document.getElementById('resultBody').className = 'result-text';
+  document.getElementById('resultBody').textContent = state.history[i].text;
+  state.lastResult = state.history[i].text;
+};
+
+// ── Dosing Calc ──
+window.calcDose = function() {
+  const vial = parseFloat(document.getElementById('vialMg').value);
+  const water = parseFloat(document.getElementById('bactWater').value);
+  const dose = parseFloat(document.getElementById('desiredMcg').value);
+  const syringe = document.getElementById('syringeType').value;
+  const sg = document.getElementById('summaryGrid');
+  if (!vial || !water) { document.getElementById('calcNum').textContent='—'; document.getElementById('calcLabel').textContent='Enter vial size and water added'; document.getElementById('calcSub').textContent=''; sg.style.display='none'; return; }
+  const conc = (vial*1000)/water;
+  sg.style.display='grid';
+  document.getElementById('s1').textContent = conc.toFixed(0);
+  document.getElementById('s2').textContent = (conc/100).toFixed(1);
+  document.getElementById('s3').textContent = dose ? Math.floor((vial*1000)/dose) : '—';
+  if (!dose) { document.getElementById('calcNum').textContent=conc.toFixed(0)+' mcg/ml'; document.getElementById('calcLabel').textContent='Concentration after reconstitution'; document.getElementById('calcSub').textContent=`${(vial*1000).toFixed(0)} mcg total in vial`; return; }
+  const ml = dose/conc;
+  if (syringe==='100') { document.getElementById('calcNum').textContent=(ml*100).toFixed(1)+' units'; document.getElementById('calcLabel').textContent=`Draw to ${(ml*100).toFixed(1)} on your U-100 syringe`; }
+  else if (syringe==='50') { document.getElementById('calcNum').textContent=(ml*50).toFixed(1)+' units'; document.getElementById('calcLabel').textContent=`Draw to ${(ml*50).toFixed(1)} on your U-50 syringe`; }
+  else { document.getElementById('calcNum').textContent=ml.toFixed(3)+' ml'; document.getElementById('calcLabel').textContent=`Draw ${ml.toFixed(3)} ml`; }
+  document.getElementById('calcSub').textContent=`= ${dose} mcg from a ${conc.toFixed(0)} mcg/ml solution`;
+};
+
+// ── Timeline ──
+function renderTimeline() {
+  const weeks = parseInt(state.cycle), pattern = state.pattern;
+  const el = document.getElementById('timeline');
+  let rows = `<div class="tl-legend"><div class="tl-legend-item"><div class="tl-dot" style="background:#E1F5EE;border:0.5px solid #5DCAA5;"></div>Active</div><div class="tl-legend-item"><div class="tl-dot" style="background:#F0EFEA;border:0.5px solid #E0DFD8;"></div>Rest</div></div>`;
+  let active = 0;
+  for (let w=1; w<=weeks; w++) {
+    const d = (w-1)%7;
+    let on = pattern==='daily' ? true : pattern==='5on2off' ? d<5 : pattern==='eod' ? w%2===1 : pattern==='2on5off' ? d<2 : [0,2,4].includes(d);
+    if(on) active++;
+    const pct = Math.round((w/weeks)*100);
+    const note = w===1?'Start low':w===weeks?'Final week':'';
+    rows+=`<div class="week-row"><div class="week-label">Wk ${w}</div><div class="week-bar ${on?'bar-on':'bar-off'}" style="width:${Math.max(pct,8)}%;">${on?'Active':'Rest'}</div>${note?`<div class="week-note">${note}</div>`:''}</div>`;
+  }
+  rows+=`<div style="margin-top:10px;font-size:11px;color:var(--text3);">${active} active weeks of ${weeks} total (${Math.round(active/weeks*100)}% on-protocol)</div>`;
+  el.innerHTML = rows;
+}
+
+// ── Compare ──
+window.runCompare = function() {
+  if (state.compareItems.size < 2) { toast('Select at least 2 peptides'); return; }
+  const items = [...state.compareItems];
+  const el = document.getElementById('compareResults');
+  let html = '<div class="compare-grid">';
+  items.forEach((name, idx) => {
+    const p = PEPTIDES[name];
+    html += `<div class="compare-card ${idx===0?'featured':''}">
+      ${idx===0?'<div style="margin-bottom:8px;"><span class="badge badge-teal">First selected</span></div>':''}
+      <div class="compare-card-name">${name}</div>
+      <div style="margin-bottom:9px;"><span class="cat-pill" style="background:${p.catBg};color:${p.catTxt};">${p.cat}</span></div>
+      <div class="compare-row"><span class="ckey">Route</span><span class="cval">${p.route}</span></div>
+      <div class="compare-row"><span class="ckey">Dose</span><span class="cval">${p.dose}</span></div>
+      <div class="compare-row"><span class="ckey">Half-life</span><span class="cval">${p.half}</span></div>
+      <div class="compare-row"><span class="ckey">Cycle</span><span class="cval">${p.cycle}</span></div>
+      <div class="compare-row"><span class="ckey">Storage</span><span class="cval">${p.storage.split(';')[0]}</span></div>
+      <div class="compare-row"><span class="ckey">Synergy</span><span class="cval">${p.synergy?.join(', ')||'N/A'}</span></div>
+      <div style="margin-top:9px;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span style="color:var(--text3);">Efficacy</span><span style="font-weight:600;">${p.eff}/10</span></div>
+        <div class="score-bar"><div class="score-fill" style="width:${p.eff*10}%;"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin:6px 0 3px;"><span style="color:var(--text3);">Safety</span><span style="font-weight:600;">${p.safe}/10</span></div>
+        <div class="score-bar"><div class="score-fill" style="width:${p.safe*10}%;background:#5DCAA5;"></div></div>
+      </div>
+      <div style="margin-top:9px;font-size:11px;color:var(--text2);line-height:1.5;">${p.notes||''}</div>
+    </div>`;
+  });
+  html += '</div>';
+  // Conflicts
+  for (let i=0;i<items.length;i++) for (let j=i+1;j<items.length;j++) {
+    const k = [items[i],items[j]].sort().join('+');
+    if (CONFLICTS[k]) html += `<div class="conflict-box" style="margin-top:11px;"><strong>⚠ Conflict (${CONFLICTS[k].sev}) — ${items[i]} + ${items[j]}:</strong><br>${CONFLICTS[k].msg}</div>`;
+  }
+  // Synergies
+  SYNERGIES.filter(s=>s.pair.every(p=>items.includes(p))).forEach(s => {
+    html += `<div class="synergy-box" style="margin-top:9px;"><strong>✓ Synergy — ${s.pair.join(' + ')}:</strong> ${s.note}</div>`;
+  });
+  el.innerHTML = html;
+};
+
+// ── DB ──
+window.renderDB = function() {
+  const q = (document.getElementById('dbSearch')?.value||'').toLowerCase();
+  const cat = document.getElementById('dbCat')?.value||'';
+  const body = document.getElementById('dbBody');
+  if (!body) return;
+  const filtered = Object.entries(PEPTIDES).filter(([n,p])=>
+    (!q || n.toLowerCase().includes(q) || p.alias.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q) || p.bestFor.some(b=>b.toLowerCase().includes(q))) &&
+    (!cat || p.cat===cat)
+  );
+  body.innerHTML = filtered.map(([n,p])=>`<tr>
+    <td><div class="pep-name">${n}</div><div class="pep-alias">${p.alias}</div></td>
+    <td><span class="cat-pill" style="background:${p.catBg};color:${p.catTxt};">${p.cat}</span></td>
+    <td>${p.route}</td>
+    <td>${p.dose}</td>
+    <td style="color:var(--text2);">${p.bestFor.slice(0,3).join(', ')}</td>
+    <td style="color:var(--text3);font-size:11px;">${p.storage.split(';')[0]}</td>
+  </tr>`).join('');
+};
+
+// ── PDF ──
+window.exportPDF = function() {
+  if (!state.lastResult) { toast('Generate a stack first'); return; }
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'mm', format:'a4' });
+    const m=16, w=210, cw=w-m*2;
+    doc.setFillColor(29,158,117); doc.rect(0,0,210,22,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(18); doc.setFont('helvetica','bold'); doc.text('PepGuide',m,14);
+    doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.text('Research Peptide Stack Report',m+44,14);
+    doc.setTextColor(50,50,50); doc.setFontSize(10);
+    doc.setFont('helvetica','bold'); doc.text('Goals:',m,32); doc.setFont('helvetica','normal'); doc.text(doc.splitTextToSize(state.lastGoals,cw-20),m+18,32);
+    doc.setFont('helvetica','bold'); doc.text('Experience:',m,38); doc.setFont('helvetica','normal'); doc.text(state.exp,m+28,38);
+    doc.setFont('helvetica','bold'); doc.text('Generated:',m,44); doc.setFont('helvetica','normal'); doc.text(new Date().toLocaleDateString(),m+26,44);
+    doc.setDrawColor(200,220,210); doc.line(m,48,w-m,48);
+    doc.setTextColor(30,30,30); doc.setFontSize(10); doc.setFont('helvetica','normal');
+    const lines = doc.splitTextToSize(state.lastResult, cw);
+    let y=56;
+    lines.forEach(line => {
+      if (y>272) { doc.addPage(); y=16; }
+      const bold = line.includes('═══')||line.startsWith('▸');
+      doc.setFont('helvetica', bold?'bold':'normal');
+      doc.setTextColor(bold?29:30, bold?158:30, bold?117:30);
+      doc.text(line,m,y); y+=5.8;
+    });
+    const pages = doc.internal.getNumberOfPages();
+    for (let i=1;i<=pages;i++) { doc.setPage(i); doc.setFontSize(8); doc.setTextColor(160); doc.text('DISCLAIMER: Educational and research purposes only. Not medical advice. Consult a physician.',m,287); doc.text(`${i}/${pages}`,w-m,287,{align:'right'}); }
+    doc.save(`pepguide-${Date.now()}.pdf`);
+    toast('PDF downloaded ✓');
+  } catch(e) { toast('PDF error — try again'); }
+};
+
+// ── Toast ──
+function toast(msg) {
+  const el = document.createElement('div'); el.className='toast'; el.textContent=msg;
+  document.body.appendChild(el); setTimeout(()=>el.remove(), 2600);
+}
+
+// ── Init ──
+renderTimeline(); renderDB(); renderHistory();
+</script>
+</body>
+</html>
