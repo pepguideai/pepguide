@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/api/generate", "destination": "/api/generate" },
+    { "source": "/api/pubmed", "destination": "/api/pubmed" },
+    { "source": "/app", "destination": "/app.html" },
+    { "source": "/research", "destination": "/research.html" },
+    { "source": "/", "destination": "/index.html" }
+  ]
+}
