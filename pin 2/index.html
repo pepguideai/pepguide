@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PIN — Peptide Intelligence Network</title>
+  <meta name="description" content="Everyone's talking about peptides. PIN is the friendliest, most comprehensive place to actually understand them. Free. AI-powered. Built for beginners."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal:#1D9E75; --tl:#E1F5EE; --tm:#5DCAA5; --td:#0F6E56; --tdp:#085041;
+      --g50:#F9FAFB; --g100:#F3F4F6; --g200:#E5E7EB; --g300:#D1D5DB;
+      --g400:#9CA3AF; --g500:#6B7280; --g600:#4B5563; --g800:#1F2937; --g900:#111827;
+      --text:#111827; --text2:#4B5563; --text3:#9CA3AF;
+      --border:#E5E7EB; --border2:#D1D5DB;
+      --r:10px; --rl:14px; --rxl:20px;
+    }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body { font-family:'Inter',sans-serif; color:var(--text); background:#fff; line-height:1.6; }
+    nav { position:sticky; top:0; z-index:100; background:rgba(255,255,255,0.96); backdrop-filter:blur(8px); border-bottom:1px solid var(--border); padding:0 5%; }
+    .nav-inner { max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:64px; }
+    .nav-logo { text-decoration:none; display:flex; align-items:baseline; gap:8px; }
+    .nav-logo-mark { font-size:22px; font-weight:800; letter-spacing:-1px; color:var(--g900); }
+    .nav-logo-mark span { color:var(--teal); }
+    .nav-logo-full { font-size:11px; color:var(--g400); font-weight:400; }
+    .nav-links { display:flex; gap:24px; align-items:center; }
+    .nav-links a { font-size:14px; font-weight:500; color:var(--text2); text-decoration:none; transition:color 0.15s; }
+    .nav-links a:hover { color:var(--teal); }
+    .nav-cta { background:var(--teal) !important; color:#fff !important; padding:9px 20px; border-radius:var(--r); font-size:14px; font-weight:600; text-decoration:none; transition:background 0.15s; }
+    .nav-cta:hover { background:var(--td) !important; }
+
+    .hero { max-width:1100px; margin:0 auto; padding:88px 5% 72px; text-align:center; }
+    .hero-eyebrow { display:inline-flex; align-items:center; gap:7px; background:var(--tl); color:var(--tdp); font-size:12px; font-weight:600; padding:5px 14px; border-radius:100px; margin-bottom:24px; }
+    .hero-eyebrow-dot { width:6px; height:6px; border-radius:50%; background:var(--teal); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+    .hero h1 { font-size:54px; font-weight:800; line-height:1.1; letter-spacing:-2.5px; color:var(--g900); margin-bottom:22px; max-width:820px; margin-left:auto; margin-right:auto; }
+    .hero h1 em { font-style:normal; color:var(--teal); }
+    .hero-sub { font-size:19px; color:var(--text2); line-height:1.7; margin-bottom:36px; max-width:580px; margin-left:auto; margin-right:auto; }
+    .hero-actions { display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap; margin-bottom:18px; }
+    .btn-primary { background:var(--teal); color:#fff; padding:15px 32px; border-radius:var(--r); font-size:16px; font-weight:700; text-decoration:none; transition:background 0.15s; display:inline-block; }
+    .btn-primary:hover { background:var(--td); }
+    .btn-outline { background:#fff; color:var(--text); padding:14px 26px; border-radius:var(--r); font-size:15px; font-weight:500; text-decoration:none; border:1.5px solid var(--border2); transition:all 0.15s; display:inline-block; }
+    .btn-outline:hover { border-color:var(--teal); color:var(--teal); }
+    .hero-reassurance { font-size:13px; color:var(--text3); }
+    .hero-reassurance span { color:var(--teal); font-weight:600; }
+
+    .proof-bar { background:var(--g50); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:18px 5%; }
+    .proof-inner { max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:center; gap:36px; flex-wrap:wrap; }
+    .proof-item { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); }
+
+    .conversation { max-width:760px; margin:0 auto; padding:88px 5%; }
+    .section-eyebrow { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.8px; color:var(--teal); margin-bottom:10px; text-align:center; }
+    .section-title { font-size:36px; font-weight:800; letter-spacing:-1px; text-align:center; margin-bottom:12px; }
+    .section-sub { font-size:17px; color:var(--text2); text-align:center; line-height:1.7; margin-bottom:48px; max-width:520px; margin-left:auto; margin-right:auto; }
+    .conv-item { display:flex; gap:18px; margin-bottom:28px; align-items:flex-start; }
+    .conv-item.right { flex-direction:row-reverse; }
+    .conv-avatar { width:42px; height:42px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:20px; }
+    .conv-avatar.user { background:var(--g100); }
+    .conv-avatar.pin { background:var(--teal); font-size:12px; font-weight:800; color:#fff; }
+    .conv-bubble { flex:1; }
+    .conv-name { font-size:11px; font-weight:600; color:var(--text3); margin-bottom:5px; text-transform:uppercase; letter-spacing:0.5px; }
+    .conv-item.right .conv-name { text-align:right; }
+    .conv-text { background:var(--g50); border:1px solid var(--border); border-radius:14px; padding:14px 16px; font-size:14px; color:var(--text); line-height:1.65; }
+    .conv-item.right .conv-text { background:var(--tl); border-color:#BBF7D0; color:var(--tdp); }
+    .conv-cta { text-align:center; margin-top:16px; }
+
+    .how { background:var(--g900); padding:80px 5%; }
+    .how-inner { max-width:1100px; margin:0 auto; }
+    .how h2 { font-size:38px; font-weight:800; color:#fff; letter-spacing:-1px; margin-bottom:10px; text-align:center; }
+    .how-sub { font-size:16px; color:rgba(255,255,255,0.45); text-align:center; margin-bottom:48px; max-width:500px; margin-left:auto; margin-right:auto; line-height:1.7; }
+    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    .step { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:var(--rl); padding:26px; }
+    .step-num { font-size:12px; font-weight:700; color:var(--tm); margin-bottom:12px; letter-spacing:0.5px; }
+    .step-title { font-size:17px; font-weight:700; color:#fff; margin-bottom:8px; letter-spacing:-0.3px; }
+    .step-desc { font-size:13px; color:rgba(255,255,255,0.45); line-height:1.65; }
+    .step-example { margin-top:14px; background:rgba(29,158,117,0.1); border:1px solid rgba(29,158,117,0.2); border-radius:var(--r); padding:10px 12px; font-size:12px; color:var(--tm); line-height:1.5; font-style:italic; }
+
+    .fears { max-width:1100px; margin:0 auto; padding:80px 5%; }
+    .fears-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-top:0; }
+    .fear-card { border:1px solid var(--border); border-radius:var(--rl); padding:22px; background:#fff; display:flex; gap:14px; align-items:flex-start; transition:border-color 0.15s; }
+    .fear-card:hover { border-color:var(--tm); }
+    .fear-icon { font-size:22px; flex-shrink:0; margin-top:2px; }
+    .fear-q { font-size:15px; font-weight:700; color:var(--g900); margin-bottom:6px; }
+    .fear-a { font-size:13px; color:var(--text2); line-height:1.65; }
+    .fear-a span { color:var(--teal); font-weight:600; }
+
+    .tools { background:var(--g50); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:80px 5%; }
+    .tools-inner { max-width:1100px; margin:0 auto; }
+    .tools-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:40px; }
+    .tool-card { background:#fff; border:1px solid var(--border); border-radius:var(--rl); padding:20px; transition:all 0.15s; }
+    .tool-card:hover { border-color:var(--teal); box-shadow:0 4px 20px rgba(29,158,117,0.07); }
+    .tool-icon { font-size:22px; margin-bottom:10px; }
+    .tool-title { font-size:14px; font-weight:700; color:var(--g900); margin-bottom:5px; }
+    .tool-desc { font-size:12px; color:var(--text2); line-height:1.6; }
+    .tool-tag { display:inline-block; font-size:10px; font-weight:600; padding:2px 8px; border-radius:100px; margin-top:8px; background:var(--tl); color:var(--tdp); }
+    .tool-tag.adv { background:var(--g100); color:var(--g600); }
+
+    .pillars { max-width:1100px; margin:0 auto; padding:80px 5%; }
+    .pillars-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:0; }
+    .pillar-card { border-radius:var(--rl); padding:28px; text-align:center; }
+    .pillar-card.wiki { background:#EFF6FF; border:1px solid #BFDBFE; }
+    .pillar-card.webmd { background:#F0FDF4; border:1px solid #BBF7D0; }
+    .pillar-card.reddit { background:#FFF7ED; border:1px solid #FED7AA; }
+    .pillar-big { font-size:30px; font-weight:800; margin-bottom:6px; letter-spacing:-0.5px; }
+    .pillar-card.wiki .pillar-big { color:#1D4ED8; }
+    .pillar-card.webmd .pillar-big { color:#15803D; }
+    .pillar-card.reddit .pillar-big { color:#C2410C; }
+    .pillar-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:10px; }
+    .pillar-card.wiki .pillar-label { color:#3B82F6; }
+    .pillar-card.webmd .pillar-label { color:var(--teal); }
+    .pillar-card.reddit .pillar-label { color:#EA580C; }
+    .pillar-desc { font-size:13px; line-height:1.65; }
+    .pillar-card.wiki .pillar-desc { color:#1E40AF; }
+    .pillar-card.webmd .pillar-desc { color:var(--tdp); }
+    .pillar-card.reddit .pillar-desc { color:#9A3412; }
+    .pillars-eq { text-align:center; font-size:28px; font-weight:800; color:var(--text3); margin:24px 0; }
+
+    .email-section { background:var(--g900); padding:80px 5%; text-align:center; }
+    .email-inner { max-width:520px; margin:0 auto; }
+    .email-section h2 { font-size:36px; font-weight:800; color:#fff; letter-spacing:-1px; margin-bottom:12px; }
+    .email-section p { font-size:16px; color:rgba(255,255,255,0.5); margin-bottom:28px; line-height:1.7; }
+    .email-form { display:flex; gap:10px; max-width:440px; margin:0 auto 14px; }
+    .email-form input { flex:1; padding:13px 16px; font-size:14px; font-family:inherit; border:1.5px solid rgba(255,255,255,0.15); border-radius:var(--r); outline:none; background:rgba(255,255,255,0.08); color:#fff; transition:border-color 0.15s; }
+    .email-form input::placeholder { color:rgba(255,255,255,0.35); }
+    .email-form input:focus { border-color:var(--teal); }
+    .email-form button { background:var(--teal); color:#fff; padding:13px 22px; border:none; border-radius:var(--r); font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; transition:background 0.15s; }
+    .email-form button:hover { background:var(--td); }
+    .email-success { display:none; background:rgba(29,158,117,0.15); border:1px solid rgba(29,158,117,0.3); border-radius:var(--r); padding:12px 20px; font-size:14px; font-weight:500; color:var(--tm); max-width:440px; margin:0 auto; }
+
+    footer { background:var(--g900); border-top:1px solid rgba(255,255,255,0.06); padding:48px 5% 28px; }
+    .footer-inner { max-width:1100px; margin:0 auto; }
+    .footer-top { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; margin-bottom:36px; }
+    .footer-mark { font-size:20px; font-weight:800; color:#fff; letter-spacing:-0.5px; }
+    .footer-mark span { color:var(--tm); }
+    .footer-full { font-size:11px; color:rgba(255,255,255,0.3); margin-top:2px; }
+    .footer-desc { font-size:13px; color:rgba(255,255,255,0.3); margin-top:10px; line-height:1.6; max-width:240px; }
+    .footer-col h4 { font-size:11px; font-weight:600; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.7px; margin-bottom:14px; }
+    .footer-col a { display:block; font-size:13px; color:rgba(255,255,255,0.35); text-decoration:none; margin-bottom:9px; transition:color 0.15s; }
+    .footer-col a:hover { color:rgba(255,255,255,0.75); }
+    .footer-bottom { border-top:1px solid rgba(255,255,255,0.07); padding-top:20px; }
+    .disclaimer { font-size:11px; color:rgba(255,255,255,0.2); line-height:1.6; }
+
+    @media(max-width:900px) {
+      .hero h1 { font-size:38px; }
+      .steps { grid-template-columns:1fr; }
+      .fears-grid { grid-template-columns:1fr; }
+      .tools-grid { grid-template-columns:1fr 1fr; }
+      .pillars-grid { grid-template-columns:1fr; }
+      .footer-top { grid-template-columns:1fr 1fr; gap:28px; }
+      .nav-links { display:none; }
+      .proof-inner { gap:16px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">P<span>I</span>N</div>
+      <div class="nav-logo-full">Peptide Intelligence Network</div>
+    </a>
+    <div class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#tools">What's inside</a>
+      <a href="research.html">Research hub</a>
+      <a href="app.html">Advanced tools</a>
+      <a href="app.html" class="nav-cta">Get started free →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow"><div class="hero-eyebrow-dot"></div>Your knowledgeable friend in the peptide space</div>
+  <h1>Everyone's talking about peptides.<br><em>Here's what you actually need to know.</em></h1>
+  <p class="hero-sub">PIN is the friendliest, most comprehensive peptide resource on the internet. Whether you've never heard of BPC-157 or you're deep into your third protocol — we've got you covered.</p>
+  <div class="hero-actions">
+    <a href="app.html" class="btn-primary">Start here — it's free →</a>
+    <a href="#how" class="btn-outline">See how it works</a>
+  </div>
+  <p class="hero-reassurance">No account needed. No jargon. <span>No judgment.</span></p>
+</section>
+
+<!-- PROOF BAR -->
+<div class="proof-bar">
+  <div class="proof-inner">
+    <div class="proof-item">🌍 Used in 20+ countries</div>
+    <div class="proof-item">🧬 40+ peptides documented</div>
+    <div class="proof-item">🔬 Live NIH PubMed research</div>
+    <div class="proof-item">🤖 Powered by Claude AI</div>
+    <div class="proof-item">✅ Always free to start</div>
+  </div>
+</div>
+
+<!-- CONVERSATION -->
+<section class="conversation">
+  <div class="section-eyebrow">Sound familiar?</div>
+  <h2 class="section-title">The questions everyone's too embarrassed to ask</h2>
+  <p class="section-sub">We built PIN for the person who keeps hearing about peptides but has no idea where to actually start — without being judged for not knowing.</p>
+
+  <div class="conv-item">
+    <div class="conv-avatar user">🙋</div>
+    <div class="conv-bubble">
+      <div class="conv-name">You</div>
+      <div class="conv-text">"My coworker won't stop talking about BPC-157 and I have no idea what it is. I'm too embarrassed to ask at this point."</div>
+    </div>
+  </div>
+  <div class="conv-item right">
+    <div class="conv-avatar pin">PIN</div>
+    <div class="conv-bubble">
+      <div class="conv-name">PIN</div>
+      <div class="conv-text">BPC-157 is a research peptide studied for its potential to accelerate healing — tendons, ligaments, muscles, even gut issues. It's one of the most beginner-friendly peptides available. Want a plain-English breakdown of what it does and whether it fits your goals?</div>
+    </div>
+  </div>
+
+  <div class="conv-item">
+    <div class="conv-avatar user">🙋</div>
+    <div class="conv-bubble">
+      <div class="conv-name">You</div>
+      <div class="conv-text">"I just got my first vial and I have no idea how much to inject or how to measure it. The internet is giving me five different answers."</div>
+    </div>
+  </div>
+  <div class="conv-item right">
+    <div class="conv-avatar pin">PIN</div>
+    <div class="conv-bubble">
+      <div class="conv-name">PIN</div>
+      <div class="conv-text">This confuses everyone at first — don't worry. Tell me your vial size and how much bacteriostatic water you added. Our dosing calculator gives you the exact number of units to draw on your syringe. No math, no Reddit rabbit holes.</div>
+    </div>
+  </div>
+
+  <div class="conv-item">
+    <div class="conv-avatar user">🙋</div>
+    <div class="conv-bubble">
+      <div class="conv-name">You</div>
+      <div class="conv-text">"I've been on a protocol for 6 weeks and genuinely don't know if it's working. How do I even tell?"</div>
+    </div>
+  </div>
+  <div class="conv-item right">
+    <div class="conv-avatar pin">PIN</div>
+    <div class="conv-bubble">
+      <div class="conv-name">PIN</div>
+      <div class="conv-text">That's exactly what the cycle journal is for. Log your energy, sleep, body composition, and mood each week. Over time the data tells you what your feelings can't — whether your protocol is performing, plateauing, or needs adjusting.</div>
+    </div>
+  </div>
+
+  <div class="conv-cta">
+    <a href="app.html" class="btn-primary">Get your questions answered →</a>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="how">
+  <div class="how-inner">
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--tm);margin-bottom:10px;text-align:center;">How PIN works</div>
+    <h2>From completely new to fully informed</h2>
+    <p class="how-sub">You don't need to know anything about peptides to get started. PIN meets you exactly where you are.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">Step 01</div>
+        <div class="step-title">Tell us what you want to achieve</div>
+        <div class="step-desc">Fat loss? Better sleep? Faster recovery? Sharper focus? Pick your goals — even if you're not sure, we'll help you figure it out. No prior knowledge needed.</div>
+        <div class="step-example">"I keep hearing about peptides for fat loss but I don't know where to start."</div>
+      </div>
+      <div class="step">
+        <div class="step-num">Step 02</div>
+        <div class="step-title">Get a protocol in plain English</div>
+        <div class="step-desc">Our AI builds you a beginner-safe research stack based on your goals, comfort level, and budget. Every recommendation explained so it actually makes sense.</div>
+        <div class="step-example">"Here's what researchers study for fat loss, why each one works, and how to start safely."</div>
+      </div>
+      <div class="step">
+        <div class="step-num">Step 03</div>
+        <div class="step-title">Learn, track, and stay confident</div>
+        <div class="step-desc">Read the research, ask follow-up questions, track your progress weekly, log your doses. PIN is the one place you'll come back to throughout your entire journey.</div>
+        <div class="step-example">"Week 4 — sleep improved. Energy up. Shoulder pain 60% better. Staying on protocol."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BEGINNER FEARS -->
+<section class="fears">
+  <div class="section-eyebrow">We've heard it all</div>
+  <h2 class="section-title">The real reasons people don't start</h2>
+  <p class="section-sub" style="margin-bottom:40px;">Every single one of these is valid. Here's how PIN addresses them.</p>
+  <div class="fears-grid">
+    <div class="fear-card">
+      <div class="fear-icon">😰</div>
+      <div><div class="fear-q">"I don't know enough to even ask the right questions."</div>
+      <div class="fear-a">That's exactly why we built the beginner wizard. 6 simple questions about your goals, experience, and comfort level. It builds your first protocol from scratch. <span>No prior knowledge required.</span></div></div>
+    </div>
+    <div class="fear-card">
+      <div class="fear-icon">💉</div>
+      <div><div class="fear-q">"Injections terrify me. Is there any way around this?"</div>
+      <div class="fear-a">Yes. Several research peptides work intranasally (nasal spray) or orally. Tell PIN your comfort level and <span>we'll only recommend routes that work for you.</span></div></div>
+    </div>
+    <div class="fear-card">
+      <div class="fear-icon">🧪</div>
+      <div><div class="fear-q">"How do I know this is safe? The internet is full of bro science."</div>
+      <div class="fear-a">Every peptide in PIN links to real PubMed studies. We show you <span>what the actual research says</span> — what's proven, what's promising, and where the gaps are. No hype.</div></div>
+    </div>
+    <div class="fear-card">
+      <div class="fear-icon">🔢</div>
+      <div><div class="fear-q">"The dosing math makes absolutely no sense to me."</div>
+      <div class="fear-a">Our dosing calculator handles all of it. Enter your vial size and water added — <span>it tells you exactly how many units to draw.</span> No calculation needed whatsoever.</div></div>
+    </div>
+    <div class="fear-card">
+      <div class="fear-icon">💸</div>
+      <div><div class="fear-q">"Is this going to be expensive?"</div>
+      <div class="fear-a">PIN is free. And we'll tell you honestly which peptides give the best results per dollar. <span>You can run an effective beginner protocol for under $100/month.</span> We filter by budget.</div></div>
+    </div>
+    <div class="fear-card">
+      <div class="fear-icon">🤷</div>
+      <div><div class="fear-q">"What if I ask a stupid question?"</div>
+      <div class="fear-a">There are no stupid questions here. Our AI advisor answers "basic" questions with zero judgment. <span>Ask anything</span> — what a peptide is, how to store it, what a syringe unit means.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools" class="tools">
+  <div class="tools-inner">
+    <div class="section-eyebrow">Everything inside PIN</div>
+    <h2 style="font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:10px;">One network. Every tool you need.</h2>
+    <p style="font-size:17px;color:var(--text2);line-height:1.7;max-width:500px;">From your very first question to your twelfth week on protocol — PIN has a tool for every moment of your research journey.</p>
+    <div class="tools-grid">
+      <div class="tool-card"><div class="tool-icon">🚀</div><div class="tool-title">Beginner wizard</div><div class="tool-desc">6 questions. A complete beginner-safe protocol in plain English. The safest way to start.</div><span class="tool-tag">Perfect for beginners</span></div>
+      <div class="tool-card"><div class="tool-icon">💬</div><div class="tool-title">AI research advisor</div><div class="tool-desc">Ask anything. Get a real answer with citations. Available 24/7 with zero judgment.</div><span class="tool-tag">Perfect for beginners</span></div>
+      <div class="tool-card"><div class="tool-icon">🧮</div><div class="tool-title">Dosing calculator</div><div class="tool-desc">Vial size + water added = exact units to draw. The math done for you, every time.</div><span class="tool-tag">Perfect for beginners</span></div>
+      <div class="tool-card"><div class="tool-icon">📖</div><div class="tool-title">Peptide encyclopedia</div><div class="tool-desc">40+ peptides fully documented. Click any compound for the complete plain-English guide.</div><span class="tool-tag">All levels</span></div>
+      <div class="tool-card"><div class="tool-icon">🔬</div><div class="tool-title">Live research hub</div><div class="tool-desc">Real PubMed studies pulled in real time, summarized in plain English. Not a static dataset.</div><span class="tool-tag">All levels</span></div>
+      <div class="tool-card"><div class="tool-icon">⚠️</div><div class="tool-title">Conflict detection</div><div class="tool-desc">Automatically flags dangerous peptide combinations before you finalize your protocol.</div><span class="tool-tag">All levels</span></div>
+      <div class="tool-card"><div class="tool-icon">⚗️</div><div class="tool-title">Stack generator</div><div class="tool-desc">Full AI protocol builder with goals, experience, budget, and injection comfort filters.</div><span class="tool-tag adv">Intermediate+</span></div>
+      <div class="tool-card"><div class="tool-icon">📓</div><div class="tool-title">Cycle journal</div><div class="tool-desc">Weekly check-ins for energy, sleep, body composition, and mood. See what's working.</div><span class="tool-tag adv">Intermediate+</span></div>
+      <div class="tool-card"><div class="tool-icon">💉</div><div class="tool-title">Vial tracker</div><div class="tool-desc">Doses remaining, reconstitution dates, expiry warnings. Never waste a vial again.</div><span class="tool-tag adv">Intermediate+</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PILLARS -->
+<section class="pillars">
+  <div class="section-eyebrow">The PIN vision</div>
+  <h2 class="section-title">Built to be the definitive peptide resource</h2>
+  <p class="section-sub">Three things the internet has never had in one place — until now.</p>
+  <div class="pillars-grid">
+    <div class="pillar-card wiki">
+      <div class="pillar-big">Wiki</div>
+      <div class="pillar-label">The encyclopedia</div>
+      <div class="pillar-desc">Every peptide fully documented. Every mechanism explained. The depth of Wikipedia — written for humans, not scientists.</div>
+    </div>
+    <div class="pillar-card webmd">
+      <div class="pillar-big">MD</div>
+      <div class="pillar-label">The research</div>
+      <div class="pillar-desc">Real published studies from NIH PubMed, summarized in plain English. The credibility of WebMD — updated live, not from a textbook.</div>
+    </div>
+    <div class="pillar-card reddit">
+      <div class="pillar-big">Community</div>
+      <div class="pillar-label">The network</div>
+      <div class="pillar-desc">Real protocols from real researchers, rated by real outcomes. The community of Reddit — without the gatekeeping or misinformation.</div>
+    </div>
+  </div>
+  <div class="pillars-eq">= PIN</div>
+</section>
+
+<!-- EMAIL -->
+<section class="email-section">
+  <div class="email-inner">
+    <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--tm);margin-bottom:12px;">Join the network</div>
+    <h2>Stay ahead of the research</h2>
+    <p>New peptides, new studies, new protocols — straight to your inbox. Written for humans, not scientists.</p>
+    <form class="email-form" id="emailForm" onsubmit="submitEmail(event)">
+      <input type="email" id="emailInput" placeholder="Your email address" required/>
+      <button type="submit" id="emailBtn">Join PIN</button>
+    </form>
+    <div class="email-success" id="emailSuccess">✓ You're in the network — we'll be in touch.</div>
+    <p style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:12px;">No spam. No sales pitches. Unsubscribe anytime.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-mark">P<span>I</span>N</div>
+        <div class="footer-full">Peptide Intelligence Network</div>
+        <div class="footer-desc">The most comprehensive AI-powered research peptide platform on the internet. For educational purposes only.</div>
+      </div>
+      <div class="footer-col">
+        <h4>Network</h4>
+        <a href="app.html">Start here</a>
+        <a href="app.html">Stack generator</a>
+        <a href="research.html">Research hub</a>
+        <a href="app.html">Dosing calculator</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About PIN</a>
+        <a href="#">Advertise</a>
+        <a href="#">Contact</a>
+        <a href="#">Mobile app</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Terms of service</a>
+        <a href="#">Privacy policy</a>
+        <a href="#">Disclaimer</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="disclaimer">© 2026 Peptide Intelligence Network (PIN). All rights reserved. PIN is for educational and research purposes only. All peptides listed are research chemicals not approved by the FDA for human use. Nothing on this site constitutes medical advice. Always consult a qualified healthcare provider before considering any peptide protocol. Never self-administer research chemicals.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+function submitEmail(e) {
+  e.preventDefault();
+  const btn = document.getElementById('emailBtn');
+  btn.textContent = 'Joining...'; btn.disabled = true;
+  fetch('https://formspree.io/f/mnjolvay', {
+    method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({email:document.getElementById('emailInput').value, source:'PIN landing page'})
+  }).catch(()=>{});
+  setTimeout(()=>{
+    document.getElementById('emailForm').style.display='none';
+    document.getElementById('emailSuccess').style.display='block';
+  }, 600);
+}
+</script>
+</body>
+</html>
