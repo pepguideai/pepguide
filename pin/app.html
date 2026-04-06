@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PIN — Research Peptide Platform</title>
+  <meta name="description" content="The complete research peptide platform. Stack generator, database, dosing calculator, cycle journal, vial tracker, and community."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #1D9E75; --tl: #E1F5EE; --tm: #5DCAA5; --td: #0F6E56; --tdp: #085041;
+      --blue: #185FA5; --bl: #E6F1FB; --purple: #534AB7; --pl: #EEEDFE; --pdp: #26215C;
+      --amber: #BA7517; --al: #FAEEDA; --red: #A32D2D; --rl: #FCEBEB;
+      --green: #3B6D11; --gl: #EAF3DE;
+      --g50:#F9FAFB; --g100:#F3F4F6; --g200:#E5E7EB; --g300:#D1D5DB;
+      --g400:#9CA3AF; --g500:#6B7280; --g600:#4B5563; --g800:#1F2937; --g900:#111827;
+      --text:#111827; --text2:#4B5563; --text3:#9CA3AF;
+      --border:#E5E7EB; --border2:#D1D5DB;
+      --r:10px; --rl2:14px; --rxl:18px;
+      --sidebar:240px;
+    }
+    html { font-size: 15px; }
+    body { font-family:'Inter',sans-serif; background:var(--g50); color:var(--text); min-height:100vh; line-height:1.6; }
+
+    /* ── LAYOUT ── */
+    .layout { display:flex; min-height:100vh; }
+    .sidebar {
+      width:var(--sidebar); flex-shrink:0; background:#fff;
+      border-right:1px solid var(--border); position:fixed;
+      top:0; left:0; bottom:0; z-index:50; display:flex; flex-direction:column;
+      overflow-y:auto;
+    }
+    .sb-logo { padding:20px 18px 14px; border-bottom:1px solid var(--border); }
+    .logo-mark { font-size:19px; font-weight:700; letter-spacing:-0.5px; }
+    .logo-mark span { color:var(--teal); }
+    .logo-tag { font-size:10px; color:var(--text3); margin-top:2px; }
+    .sb-section { padding:10px 10px 4px; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; color:var(--text3); }
+    .sb-nav { padding:4px 8px; }
+    .nav-item {
+      display:flex; align-items:center; gap:9px; padding:8px 10px;
+      border-radius:var(--r); font-size:13px; font-weight:500; color:var(--text2);
+      cursor:pointer; transition:all 0.12s; margin-bottom:1px; user-select:none;
+    }
+    .nav-item:hover { background:var(--g100); color:var(--text); }
+    .nav-item.active { background:var(--tl); color:var(--tdp); }
+    .nav-icon { font-size:15px; width:18px; text-align:center; flex-shrink:0; }
+    .nav-badge { margin-left:auto; font-size:10px; background:var(--teal); color:#fff; padding:1px 6px; border-radius:100px; font-weight:600; }
+    .sb-footer { padding:14px 16px; border-top:1px solid var(--border); margin-top:auto; font-size:11px; color:var(--text3); line-height:1.5; }
+
+    .main { margin-left:var(--sidebar); flex:1; min-height:100vh; }
+    .page-header { background:#fff; border-bottom:1px solid var(--border); padding:16px 28px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:40; }
+    .page-header-left { }
+    .page-title { font-size:17px; font-weight:700; letter-spacing:-0.3px; }
+    .page-sub { font-size:12px; color:var(--text2); margin-top:1px; }
+    .page-actions { display:flex; gap:8px; }
+    .content { padding:24px 28px; }
+
+    /* ── PANELS ── */
+    .panel { display:none; }
+    .panel.active { display:block; }
+
+    /* ── CARDS ── */
+    .card { background:#fff; border:1px solid var(--border); border-radius:var(--rl2); overflow:hidden; margin-bottom:14px; }
+    .card-head { padding:13px 17px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+    .card-title { font-size:13px; font-weight:600; }
+    .card-body { padding:17px; }
+
+    /* ── COMMON UI ── */
+    .slabel { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; color:var(--text3); margin-bottom:8px; }
+    .chip-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:7px; margin-bottom:16px; }
+    .chip { border:1px solid var(--border2); border-radius:var(--r); padding:8px 11px; cursor:pointer; font-size:13px; color:var(--text2); background:#fff; transition:all 0.12s; display:flex; align-items:center; gap:7px; user-select:none; }
+    .chip:hover { border-color:var(--tm); }
+    .chip.on { border-color:var(--teal); background:var(--tl); color:var(--tdp); font-weight:500; }
+    .chip-dot { width:6px; height:6px; border-radius:50%; background:var(--tm); flex-shrink:0; opacity:0; transition:opacity 0.12s; }
+    .chip.on .chip-dot { opacity:1; }
+    .pill-row { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px; }
+    .pill { border:1px solid var(--border2); border-radius:100px; padding:5px 13px; font-size:12px; font-weight:500; cursor:pointer; color:var(--text2); background:#fff; transition:all 0.12s; user-select:none; }
+    .pill:hover { border-color:var(--tm); }
+    .pill.on { border-color:var(--teal); background:var(--tl); color:var(--tdp); }
+    input[type=text],input[type=number],input[type=email],textarea,select {
+      width:100%; padding:9px 11px; font-size:13px; font-family:inherit;
+      border:1px solid var(--border2); border-radius:var(--r);
+      background:#fff; color:var(--text); outline:none; transition:border-color 0.12s;
+    }
+    input:focus,textarea:focus,select:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(29,158,117,0.08); }
+    textarea { resize:vertical; min-height:68px; }
+    .row2 { display:grid; grid-template-columns:1fr 1fr; gap:11px; margin-bottom:16px; }
+    .row3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:11px; margin-bottom:16px; }
+    .field { display:flex; flex-direction:column; gap:5px; }
+    .field label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.6px; color:var(--text3); }
+    .field-group { margin-bottom:16px; }
+    .btn { padding:9px 18px; font-size:13px; font-weight:600; border-radius:var(--r); cursor:pointer; transition:all 0.12s; border:none; display:inline-flex; align-items:center; gap:6px; }
+    .btn-primary { background:var(--teal); color:#fff; }
+    .btn-primary:hover { background:var(--td); }
+    .btn-primary:disabled { background:var(--g200); color:var(--text3); cursor:not-allowed; }
+    .btn-outline { background:#fff; color:var(--text2); border:1px solid var(--border2); }
+    .btn-outline:hover { border-color:var(--teal); color:var(--td); }
+    .btn-danger { background:var(--rl); color:var(--red); border:1px solid #F09595; }
+    .btn-full { width:100%; justify-content:center; }
+    .btn-sm { padding:6px 13px; font-size:12px; }
+    .badge { display:inline-flex; align-items:center; font-size:11px; font-weight:600; padding:3px 9px; border-radius:100px; }
+    .badge-teal { background:var(--tl); color:var(--tdp); }
+    .badge-amber { background:var(--al); color:#633806; }
+    .badge-red { background:var(--rl); color:var(--red); }
+    .badge-blue { background:var(--bl); color:var(--blue); }
+    .badge-gray { background:var(--g100); color:var(--g600); }
+    .badge-purple { background:var(--pl); color:var(--pdp); }
+    .alert-box { border-radius:var(--r); padding:12px 14px; font-size:13px; line-height:1.6; margin-top:11px; }
+    .alert-red { background:var(--rl); border:1px solid #F09595; color:#4A1B0C; }
+    .alert-amber { background:var(--al); border:1px solid #FAC775; color:#412402; }
+    .alert-teal { background:var(--tl); border:1px solid var(--tm); color:var(--tdp); }
+    .action-row { display:flex; gap:7px; justify-content:flex-end; padding:12px 17px; border-top:1px solid var(--border); }
+    .result-text { font-size:13px; line-height:1.85; white-space:pre-wrap; color:var(--text); font-family:monospace; }
+    .result-text.loading { color:var(--text3); font-style:italic; font-family:inherit; }
+    .empty-state { text-align:center; padding:40px 20px; color:var(--text3); font-size:13px; }
+    .empty-icon { font-size:32px; margin-bottom:10px; }
+    .stat-grid { display:grid; gap:10px; margin-bottom:16px; }
+    .stat-card { background:var(--g100); border-radius:var(--r); padding:14px 16px; }
+    .stat-num { font-size:24px; font-weight:700; color:var(--text); }
+    .stat-label { font-size:11px; color:var(--text3); margin-top:2px; }
+    .toast { position:fixed; bottom:22px; right:22px; background:var(--g800); color:#fff; padding:11px 18px; border-radius:var(--r); font-size:13px; font-weight:500; z-index:999; animation:slideUp 0.2s ease; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+    @keyframes slideUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .disclaimer { font-size:11px; color:var(--text3); line-height:1.6; margin-top:24px; padding-top:14px; border-top:1px solid var(--border); }
+    .progress-bar { height:6px; background:var(--g200); border-radius:3px; overflow:hidden; }
+    .progress-fill { height:100%; border-radius:3px; background:var(--teal); transition:width 0.3s; }
+    .tag { font-size:10px; padding:2px 8px; border-radius:100px; font-weight:600; display:inline-block; }
+
+    /* ── WIZARD ── */
+    .wizard-step { display:none; }
+    .wizard-step.active { display:block; }
+    .wizard-progress { display:flex; gap:6px; margin-bottom:24px; }
+    .wiz-dot { flex:1; height:4px; border-radius:2px; background:var(--g200); transition:background 0.2s; }
+    .wiz-dot.done { background:var(--teal); }
+    .wizard-nav { display:flex; justify-content:space-between; margin-top:20px; }
+    .wiz-question { font-size:18px; font-weight:600; letter-spacing:-0.3px; margin-bottom:8px; }
+    .wiz-sub { font-size:14px; color:var(--text2); margin-bottom:20px; }
+    .wiz-options { display:flex; flex-direction:column; gap:8px; }
+    .wiz-option { border:1px solid var(--border2); border-radius:var(--r); padding:13px 16px; cursor:pointer; font-size:14px; font-weight:500; color:var(--text); transition:all 0.12s; display:flex; align-items:center; gap:10px; }
+    .wiz-option:hover { border-color:var(--teal); background:var(--tl); }
+    .wiz-option.selected { border-color:var(--teal); background:var(--tl); color:var(--tdp); }
+    .wiz-option-icon { font-size:20px; flex-shrink:0; }
+
+    /* ── CHAT ── */
+    .chat-wrap { display:flex; flex-direction:column; height:500px; }
+    .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
+    .chat-msg { max-width:85%; }
+    .chat-msg.user { align-self:flex-end; }
+    .chat-msg.ai { align-self:flex-start; }
+    .chat-bubble { padding:10px 14px; border-radius:var(--rl2); font-size:13px; line-height:1.6; }
+    .chat-msg.user .chat-bubble { background:var(--teal); color:#fff; border-bottom-right-radius:4px; }
+    .chat-msg.ai .chat-bubble { background:var(--g100); color:var(--text); border-bottom-left-radius:4px; }
+    .chat-sender { font-size:11px; color:var(--text3); margin-bottom:3px; }
+    .chat-msg.user .chat-sender { text-align:right; }
+    .chat-input-row { padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px; }
+    .chat-input-row input { flex:1; }
+
+    /* ── JOURNAL ── */
+    .journal-week { border:1px solid var(--border); border-radius:var(--rl2); padding:16px; margin-bottom:10px; background:#fff; }
+    .journal-week-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+    .journal-week-title { font-size:13px; font-weight:600; }
+    .journal-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:12px; }
+    .metric-item { text-align:center; }
+    .metric-label { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; }
+    .metric-stars { display:flex; justify-content:center; gap:2px; }
+    .star { font-size:16px; cursor:pointer; transition:transform 0.1s; color:var(--g300); }
+    .star.on { color:#F59E0B; }
+    .star:hover { transform:scale(1.2); }
+    .journal-note { font-size:12px; color:var(--text2); font-style:italic; padding-top:10px; border-top:1px solid var(--border); }
+
+    /* ── VIAL TRACKER ── */
+    .vial-card { border:1px solid var(--border); border-radius:var(--rl2); padding:16px; background:#fff; margin-bottom:10px; }
+    .vial-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+    .vial-name { font-size:14px; font-weight:600; }
+    .vial-meta { font-size:12px; color:var(--text3); margin-top:2px; }
+    .vial-doses-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .vial-doses-label { font-size:12px; color:var(--text2); min-width:80px; }
+    .vial-doses-bar { flex:1; height:8px; background:var(--g200); border-radius:4px; overflow:hidden; }
+    .vial-doses-fill { height:100%; border-radius:4px; background:var(--teal); transition:width 0.3s; }
+    .vial-doses-count { font-size:12px; font-weight:600; color:var(--text); min-width:40px; text-align:right; }
+    .vial-warning { font-size:11px; padding:6px 10px; border-radius:6px; background:var(--al); color:#633806; margin-top:8px; }
+    .vial-expired { background:var(--rl); color:var(--red); }
+
+    /* ── INJECTION ROTATOR ── */
+    .body-diagram { display:flex; gap:20px; justify-content:center; margin:16px 0; }
+    .body-side { text-align:center; }
+    .body-side-label { font-size:11px; color:var(--text3); margin-bottom:8px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+    .body-svg-wrap { position:relative; display:inline-block; }
+    .inj-site { cursor:pointer; transition:all 0.15s; }
+    .inj-site circle { transition:all 0.15s; }
+    .inj-site:hover circle { r:10; }
+    .inj-site.used circle { fill:#FEF3C7; stroke:#F59E0B; }
+    .inj-site.recent circle { fill:#DCFCE7; stroke:#16A34A; }
+    .inj-site.overused circle { fill:var(--rl); stroke:#EF4444; }
+    .site-log { margin-top:12px; }
+    .site-log-item { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:12px; }
+    .site-log-item:last-child { border:none; }
+
+    /* ── PEPTIDE PAGES ── */
+    .pep-page-hero { background:linear-gradient(135deg,#F0FDF4,#E1F5EE); border:1px solid #BBF7D0; border-radius:var(--rxl); padding:24px; margin-bottom:16px; }
+    .pep-page-name { font-size:28px; font-weight:700; letter-spacing:-0.5px; margin-bottom:4px; }
+    .pep-page-alias { font-size:14px; color:var(--text2); margin-bottom:12px; }
+    .pep-page-tags { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px; }
+    .pep-page-summary { font-size:14px; color:var(--text2); line-height:1.7; }
+    .pep-detail-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+    .pep-detail-card { background:#fff; border:1px solid var(--border); border-radius:var(--r); padding:12px 14px; }
+    .pep-detail-label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text3); margin-bottom:4px; }
+    .pep-detail-val { font-size:13px; font-weight:600; color:var(--text); }
+    .pep-section { margin-bottom:20px; }
+    .pep-section h3 { font-size:14px; font-weight:600; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+    .pep-section p { font-size:13px; color:var(--text2); line-height:1.7; }
+    .pep-beginners-box { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:var(--r); padding:14px 16px; margin-bottom:16px; }
+    .pep-beginners-box h4 { font-size:13px; font-weight:600; color:#1D4ED8; margin-bottom:6px; }
+    .pep-beginners-box p { font-size:13px; color:#1E40AF; line-height:1.6; }
+
+    /* ── COMMUNITY ── */
+    .community-stack { border:1px solid var(--border); border-radius:var(--rl2); padding:16px; background:#fff; margin-bottom:10px; transition:border-color 0.12s; }
+    .community-stack:hover { border-color:var(--teal); }
+    .cs-head { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+    .cs-goals { font-size:13px; font-weight:600; }
+    .cs-meta { font-size:11px; color:var(--text3); margin-top:2px; }
+    .cs-peptides { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+    .cs-pep { font-size:11px; padding:3px 9px; border-radius:100px; background:var(--g100); color:var(--text2); font-weight:500; }
+    .cs-stats { display:flex; gap:14px; font-size:12px; color:var(--text3); }
+    .cs-rating { display:flex; gap:2px; }
+    .cs-star { color:#F59E0B; font-size:12px; }
+
+    /* ── COMPARE ── */
+    .compare-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:10px; margin-top:12px; }
+    .compare-card { border:1px solid var(--border); border-radius:var(--rl2); padding:14px; background:#fff; }
+    .compare-card.featured { border:2px solid var(--teal); }
+    .compare-card-name { font-size:14px; font-weight:600; margin-bottom:8px; }
+    .compare-row { display:flex; justify-content:space-between; font-size:12px; padding:5px 0; border-bottom:1px solid var(--border); gap:6px; }
+    .compare-row:last-child { border:none; }
+    .ckey { color:var(--text3); flex-shrink:0; }
+    .cval { text-align:right; font-weight:500; font-size:11px; }
+    .score-bar { height:4px; border-radius:2px; background:var(--g200); margin-top:5px; }
+    .score-fill { height:100%; border-radius:2px; background:var(--teal); }
+
+    /* ── CALC ── */
+    .calc-result-card { background:var(--tl); border:1px solid var(--tm); border-radius:var(--rl2); padding:20px 22px; margin-bottom:16px; }
+    .calc-big { font-size:36px; font-weight:700; color:var(--td); line-height:1; }
+    .calc-label { font-size:13px; color:var(--td); margin-top:4px; }
+    .calc-sub { font-size:12px; color:var(--tdp); margin-top:2px; opacity:0.7; }
+    .sum-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:16px; }
+
+    /* ── TIMELINE ── */
+    .tl-legend { display:flex; gap:14px; margin-bottom:11px; }
+    .tl-legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text2); }
+    .tl-dot { width:10px; height:10px; border-radius:2px; }
+    .week-row { display:flex; align-items:center; gap:9px; margin-bottom:5px; }
+    .week-label { font-size:11px; color:var(--text3); width:42px; flex-shrink:0; }
+    .week-bar { height:22px; border-radius:4px; display:flex; align-items:center; padding:0 8px; font-size:11px; font-weight:500; min-width:50px; }
+    .bar-on { background:var(--tl); color:var(--tdp); border:1px solid var(--tm); }
+    .bar-off { background:var(--g100); color:var(--text3); }
+
+    /* ── DB TABLE ── */
+    .db-search-row { display:flex; gap:9px; margin-bottom:14px; }
+    .pep-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .pep-table th { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text3); padding:8px 11px; border-bottom:1px solid var(--border); text-align:left; }
+    .pep-table td { padding:10px 11px; border-bottom:1px solid var(--border); vertical-align:top; }
+    .pep-table tr:hover td { background:var(--g50); cursor:pointer; }
+    .pep-table tr:last-child td { border-bottom:none; }
+    .pep-name { font-weight:600; font-size:13px; color:var(--teal); }
+    .pep-alias { font-size:10px; color:var(--text3); }
+
+    @media(max-width:768px) {
+      .sidebar { transform:translateX(-100%); transition:transform 0.2s; }
+      .sidebar.open { transform:translateX(0); }
+      .main { margin-left:0; }
+      .content { padding:14px; }
+      .row2,.row3 { grid-template-columns:1fr; }
+      .pep-detail-grid { grid-template-columns:1fr 1fr; }
+      .journal-metrics { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="logo-mark">P<span>I</span>N</div>
+    <div class="logo-tag">Peptide Intelligence Network</div>
+  </div>
+  <div class="sb-section">Generate</div>
+  <div class="sb-nav">
+    <div class="nav-item active" onclick="show('wizard')"><span class="nav-icon">🚀</span>Start here <span class="nav-badge">New</span></div>
+    <div class="nav-item" onclick="show('generator')"><span class="nav-icon">⚗️</span>Stack generator</div>
+    <div class="nav-item" onclick="show('chat')"><span class="nav-icon">💬</span>Ask PIN AI</div>
+  </div>
+  <div class="sb-section">Research</div>
+  <div class="sb-nav">
+    <div class="nav-item" onclick="show('database')"><span class="nav-icon">🗄️</span>Peptide database</div>
+    <div class="nav-item" onclick="show('compare')"><span class="nav-icon">⚖️</span>Compare peptides</div>
+    <div class="nav-item" onclick="show('calculator')"><span class="nav-icon">🧮</span>Dosing calculator</div>
+  </div>
+  <div class="sb-section">Track</div>
+  <div class="sb-nav">
+    <div class="nav-item" onclick="show('journal')"><span class="nav-icon">📓</span>Cycle journal</div>
+    <div class="nav-item" onclick="show('vials')"><span class="nav-icon">💉</span>Vial tracker</div>
+    <div class="nav-item" onclick="show('rotator')"><span class="nav-icon">🎯</span>Injection sites</div>
+  </div>
+  <div class="sb-section">Community</div>
+  <div class="sb-nav">
+    <div class="nav-item" onclick="show('community')"><span class="nav-icon">👥</span>Stack feed</div>
+    <div class="nav-item" onclick="show('history')"><span class="nav-icon">📋</span>My saved stacks</div>
+  </div>
+  <div class="sb-footer">Research use only.<br>Not medical advice.<br>Consult a physician.</div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-title" id="pageTitle">Start here</div>
+      <div class="page-sub" id="pageSub">Build your first peptide stack in 2 minutes</div>
+    </div>
+    <div class="page-actions" id="pageActions"></div>
+  </div>
+  <div class="content">
+
+    <!-- ══ WIZARD ══ -->
+    <div class="panel active" id="panel-wizard">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Beginner setup wizard</div><span class="badge badge-teal" id="wizStepBadge">Step 1 of 6</span></div>
+        <div class="card-body">
+          <div class="wizard-progress" id="wizProgress"></div>
+          <div id="wizContent"></div>
+        </div>
+      </div>
+      <div class="card" id="wizResult" style="display:none;">
+        <div class="card-head"><div class="card-title">Your beginner starter stack</div><span class="badge badge-teal">Personalized</span></div>
+        <div class="card-body">
+          <div class="result-text loading" id="wizResultBody">Building your personalized beginner stack...</div>
+        </div>
+        <div class="action-row">
+          <button class="btn btn-outline btn-sm" onclick="show('generator')">Customize further</button>
+          <button class="btn btn-primary btn-sm" onclick="saveWizResult()">💾 Save stack</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ GENERATOR ══ -->
+    <div class="panel" id="panel-generator">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Goals & profile</div></div>
+        <div class="card-body">
+          <div class="slabel">Primary goals</div>
+          <div class="chip-grid" id="goalGrid"></div>
+          <div class="slabel">Experience level</div>
+          <div class="pill-row" id="expPills">
+            <div class="pill on" data-e="beginner">Beginner</div>
+            <div class="pill" data-e="intermediate">Intermediate</div>
+            <div class="pill" data-e="advanced">Advanced</div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Age</label><input type="number" id="age" placeholder="e.g. 38" min="18" max="90"/></div>
+            <div class="field"><label>Biological sex</label>
+              <select id="sex"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option></select>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Budget (monthly)</label>
+              <select id="budget"><option value="">No preference</option><option value="under100">Under $100</option><option value="100-300">$100–300</option><option value="300plus">$300+</option></select>
+            </div>
+            <div class="field"><label>Injection comfort</label>
+              <select id="inject"><option value="any">Any route is fine</option><option value="subq">SubQ only</option><option value="nasal">Intranasal only</option><option value="oral">Oral only</option></select>
+            </div>
+          </div>
+          <div class="field field-group"><label>Additional context</label>
+            <textarea id="extra" placeholder="e.g. 185 lbs, training 5x/week, recovering from rotator cuff injury, no prior peptide experience, current medications..."></textarea>
+          </div>
+          <button class="btn btn-primary btn-full" id="genBtn" onclick="generate()">Generate my peptide stack</button>
+        </div>
+      </div>
+      <div class="card" id="resultCard" style="display:none;">
+        <div class="card-head">
+          <div class="card-title">Suggested research stack</div>
+          <div style="display:flex;gap:6px;" id="resultBadges"><span class="badge badge-teal">Research only</span></div>
+        </div>
+        <div class="card-body">
+          <div class="result-text loading" id="resultBody">Analyzing your goals...</div>
+          <div id="conflictSection"></div>
+          <div id="synergySection"></div>
+        </div>
+        <div class="action-row">
+          <button class="btn btn-outline btn-sm" onclick="saveStack()">💾 Save stack</button>
+          <button class="btn btn-outline btn-sm" onclick="shareStack()">🔗 Share</button>
+          <button class="btn btn-outline btn-sm" onclick="exportPDF()">📄 PDF</button>
+        </div>
+      </div>
+      <div class="disclaimer">For educational and research purposes only. Not medical advice. Peptides are research chemicals not approved by the FDA for human use. Always consult a qualified healthcare provider.</div>
+    </div>
+
+    <!-- ══ CHAT ══ -->
+    <div class="panel" id="panel-chat">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Ask PIN AI anything</div><span class="badge badge-teal">Powered by Claude</span></div>
+        <div class="chat-wrap">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg ai">
+              <div class="chat-sender">PIN AI</div>
+              <div class="chat-bubble">Hi! I'm PIN AI. Ask me anything about peptides — dosing questions, what a peptide does, how to reconstitute, stack advice, side effects, or anything else. I'm here to help beginners and experts alike. What's on your mind?</div>
+            </div>
+          </div>
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Ask anything about peptides..." onkeydown="if(event.key==='Enter')sendChat()"/>
+            <button class="btn btn-primary btn-sm" onclick="sendChat()">Send</button>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="slabel">Suggested questions</div>
+        <div class="pill-row" id="suggestedQs"></div>
+      </div>
+    </div>
+
+    <!-- ══ DATABASE ══ -->
+    <div class="panel" id="panel-database">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Peptide reference database</div><span class="badge badge-teal" id="dbCount"></span></div>
+        <div class="card-body" style="padding-bottom:0;">
+          <div class="db-search-row">
+            <input type="text" id="dbSearch" placeholder="Search peptides, categories, uses..." oninput="renderDB()"/>
+            <select id="dbCat" onchange="renderDB()" style="width:180px;">
+              <option value="">All categories</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="pep-table">
+            <thead><tr><th>Peptide</th><th>Category</th><th>Best for</th><th>Route</th><th>Research dose</th><th>Safety</th></tr></thead>
+            <tbody id="dbBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card" id="pepDetailCard" style="display:none;">
+        <div id="pepDetailContent"></div>
+      </div>
+    </div>
+
+    <!-- ══ COMPARE ══ -->
+    <div class="panel" id="panel-compare">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Select peptides to compare</div><span class="badge badge-gray" id="cmpCount">0 selected</span></div>
+        <div class="card-body">
+          <div class="chip-grid" id="compareChips"></div>
+          <button class="btn btn-primary" onclick="runCompare()">Compare selected</button>
+        </div>
+      </div>
+      <div id="compareResults"></div>
+    </div>
+
+    <!-- ══ CALCULATOR ══ -->
+    <div class="panel" id="panel-calculator">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Reconstitution & dosing calculator</div></div>
+        <div class="card-body">
+          <div class="row2">
+            <div class="field"><label>Vial size (mg)</label><input type="number" id="vialMg" placeholder="e.g. 5" oninput="calcDose()"/></div>
+            <div class="field"><label>Bacteriostatic water added (ml)</label><input type="number" id="bactWater" placeholder="e.g. 2" oninput="calcDose()"/></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Desired dose (mcg)</label><input type="number" id="desiredMcg" placeholder="e.g. 300" oninput="calcDose()"/></div>
+            <div class="field"><label>Syringe type</label>
+              <select id="syringeType" onchange="calcDose()">
+                <option value="100">U-100 insulin syringe</option>
+                <option value="50">U-50 insulin syringe</option>
+                <option value="direct">Standard syringe (ml)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-result-card">
+        <div class="calc-big" id="calcNum">—</div>
+        <div class="calc-label" id="calcLabel">Enter values above to calculate</div>
+        <div class="calc-sub" id="calcSub"></div>
+      </div>
+      <div class="sum-grid" id="summaryGrid" style="display:none;">
+        <div class="stat-card"><div class="stat-num" id="s1">—</div><div class="stat-label">mcg per ml</div></div>
+        <div class="stat-card"><div class="stat-num" id="s2">—</div><div class="stat-label">mcg per U-100 unit</div></div>
+        <div class="stat-card"><div class="stat-num" id="s3">—</div><div class="stat-label">doses in vial</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Protocol timeline</div></div>
+        <div class="card-body">
+          <div class="slabel">Cycle length</div>
+          <div class="pill-row" id="cyclePills">
+            <div class="pill on" data-c="4">4 weeks</div>
+            <div class="pill" data-c="8">8 weeks</div>
+            <div class="pill" data-c="12">12 weeks</div>
+            <div class="pill" data-c="16">16 weeks</div>
+          </div>
+          <div class="slabel">Dosing pattern</div>
+          <div class="pill-row" id="patternPills">
+            <div class="pill on" data-p="5on2off">5 on / 2 off</div>
+            <div class="pill" data-p="daily">Daily</div>
+            <div class="pill" data-p="eod">Every other day</div>
+            <div class="pill" data-p="2on5off">2 on / 5 off</div>
+            <div class="pill" data-p="3wk">3x per week</div>
+          </div>
+          <div id="timeline"></div>
+        </div>
+      </div>
+      <div class="disclaimer">Always use bacteriostatic water for multi-use vials. Reconstituted peptides at 2–8°C are stable ~28 days. Lyophilized at −20°C stable 1–2 years.</div>
+    </div>
+
+    <!-- ══ JOURNAL ══ -->
+    <div class="panel" id="panel-journal">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Cycle journal</div>
+          <button class="btn btn-primary btn-sm" onclick="addJournalEntry()">+ Log this week</button>
+        </div>
+        <div class="card-body" id="journalContent"></div>
+      </div>
+    </div>
+
+    <!-- ══ VIALS ══ -->
+    <div class="panel" id="panel-vials">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Vial tracker</div>
+          <button class="btn btn-primary btn-sm" onclick="showAddVial()">+ Add vial</button>
+        </div>
+        <div class="card-body" id="vialContent"></div>
+      </div>
+      <div class="card" id="addVialCard" style="display:none;">
+        <div class="card-head"><div class="card-title">Add new vial</div></div>
+        <div class="card-body">
+          <div class="row2">
+            <div class="field"><label>Peptide name</label><input type="text" id="vialPep" placeholder="e.g. BPC-157"/></div>
+            <div class="field"><label>Vial size (mg)</label><input type="number" id="vialSize" placeholder="e.g. 5"/></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Dose per injection (mcg)</label><input type="number" id="vialDose" placeholder="e.g. 250"/></div>
+            <div class="field"><label>Status</label>
+              <select id="vialStatus"><option value="lyophilized">Lyophilized (not yet reconstituted)</option><option value="reconstituted">Reconstituted</option></select>
+            </div>
+          </div>
+          <div class="field field-group"><label>Reconstitution date (if applicable)</label><input type="text" id="vialDate" placeholder="e.g. April 5, 2026"/></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary" onclick="addVial()">Add vial</button>
+            <button class="btn btn-outline" onclick="document.getElementById('addVialCard').style.display='none'">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ROTATOR ══ -->
+    <div class="panel" id="panel-rotator">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Injection site rotator</div><button class="btn btn-primary btn-sm" onclick="logInjection()">+ Log injection</button></div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Tap a site to log an injection. Rotating sites prevents tissue damage and improves absorption.</p>
+          <div class="body-diagram">
+            <div class="body-side">
+              <div class="body-side-label">Front</div>
+              <svg width="140" height="260" viewBox="0 0 140 260">
+                <ellipse cx="70" cy="28" rx="22" ry="26" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <rect x="42" y="52" width="56" height="90" rx="12" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <rect x="18" y="56" width="26" height="72" rx="10" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <rect x="96" y="56" width="26" height="72" rx="10" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <rect x="48" y="140" width="20" height="90" rx="8" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <rect x="72" y="140" width="20" height="90" rx="8" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <g class="inj-site" id="site-abdL" onclick="toggleSite('abdL','Left abdomen')"><circle cx="52" cy="100" r="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/><text x="52" y="104" text-anchor="middle" font-size="8" fill="#085041">AbL</text></g>
+                <g class="inj-site" id="site-abdR" onclick="toggleSite('abdR','Right abdomen')"><circle cx="88" cy="100" r="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/><text x="88" y="104" text-anchor="middle" font-size="8" fill="#085041">AbR</text></g>
+                <g class="inj-site" id="site-thighL" onclick="toggleSite('thighL','Left thigh')"><circle cx="54" cy="168" r="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/><text x="54" y="172" text-anchor="middle" font-size="8" fill="#085041">ThL</text></g>
+                <g class="inj-site" id="site-thighR" onclick="toggleSite('thighR','Right thigh')"><circle cx="80" cy="168" r="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/><text x="80" y="172" text-anchor="middle" font-size="8" fill="#085041">ThR</text></g>
+                <g class="inj-site" id="site-armL" onclick="toggleSite('armL','Left arm')"><circle cx="24" cy="80" r="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/><text x="24" y="84" text-anchor="middle" font-size="8" fill="#085041">ArL</text></g>
+                <g class="inj-site" id="site-armR" onclick="toggleSite('armR','Right arm')"><circle cx="116" cy="80" r="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/><text x="116" y="84" text-anchor="middle" font-size="8" fill="#085041">ArR</text></g>
+              </svg>
+            </div>
+            <div class="body-side">
+              <div class="body-side-label">Back / Glute</div>
+              <svg width="140" height="260" viewBox="0 0 140 260">
+                <ellipse cx="70" cy="28" rx="22" ry="26" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <rect x="42" y="52" width="56" height="90" rx="12" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <rect x="18" y="56" width="26" height="72" rx="10" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <rect x="96" y="56" width="26" height="72" rx="10" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <ellipse cx="55" cy="145" rx="18" ry="16" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <ellipse cx="85" cy="145" rx="18" ry="16" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <rect x="48" y="158" width="20" height="80" rx="8" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <rect x="72" y="158" width="20" height="80" rx="8" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1.5"/>
+                <g class="inj-site" id="site-gluteL" onclick="toggleSite('gluteL','Left glute')"><circle cx="52" cy="142" r="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/><text x="52" y="146" text-anchor="middle" font-size="8" fill="#085041">GlL</text></g>
+                <g class="inj-site" id="site-gluteR" onclick="toggleSite('gluteR','Right glute')"><circle cx="88" cy="142" r="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/><text x="88" y="146" text-anchor="middle" font-size="8" fill="#085041">GlR</text></g>
+                <g class="inj-site" id="site-latL" onclick="toggleSite('latL','Left lat')"><circle cx="46" cy="88" r="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/><text x="46" y="92" text-anchor="middle" font-size="8" fill="#085041">LaL</text></g>
+                <g class="inj-site" id="site-latR" onclick="toggleSite('latR','Right lat')"><circle cx="94" cy="88" r="8" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.5"/><text x="94" y="92" text-anchor="middle" font-size="8" fill="#085041">LaR</text></g>
+              </svg>
+            </div>
+          </div>
+          <div class="slabel" style="margin-top:4px;">Site legend</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:5px;font-size:12px;"><div style="width:10px;height:10px;border-radius:50%;background:#E1F5EE;border:1.5px solid #1D9E75;"></div>Available</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:12px;"><div style="width:10px;height:10px;border-radius:50%;background:#DCFCE7;border:1.5px solid #16A34A;"></div>Used recently</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:12px;"><div style="width:10px;height:10px;border-radius:50%;background:#FEF3C7;border:1.5px solid #F59E0B;"></div>Resting</div>
+          </div>
+          <div class="slabel">Injection log</div>
+          <div class="site-log" id="siteLog"><div style="font-size:13px;color:var(--text3);">No injections logged yet. Tap a site above to log one.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ COMMUNITY ══ -->
+    <div class="panel" id="panel-community">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Community stack feed</div>
+          <div style="display:flex;gap:7px;">
+            <div class="pill on" style="cursor:pointer;" onclick="filterCommunity('all')">All goals</div>
+            <div class="pill" style="cursor:pointer;" onclick="filterCommunity('fat')">Fat loss</div>
+            <div class="pill" style="cursor:pointer;" onclick="filterCommunity('muscle')">Muscle</div>
+            <div class="pill" style="cursor:pointer;" onclick="filterCommunity('cognitive')">Cognitive</div>
+          </div>
+        </div>
+        <div class="card-body" id="communityFeed"></div>
+      </div>
+    </div>
+
+    <!-- ══ HISTORY ══ -->
+    <div class="panel" id="panel-history">
+      <div class="card">
+        <div class="card-head"><div class="card-title">My saved stacks</div><button class="btn btn-outline btn-sm" onclick="clearHistory()">Clear all</button></div>
+        <div class="card-body" id="historyList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// PEPTIDE DATABASE
+// ══════════════════════════════════════
+const PEPTIDES = {
+  'BPC-157':{ alias:'Body Protection Compound-157', cat:'Healing', catBg:'#E1F5EE', catTxt:'#085041', route:'SubQ / IM / Oral', dose:'250–500 mcg/day', freq:'Once or twice daily', half:'~4h', cycle:'4–12 weeks', storage:'−20°C lyophilized', synergy:['TB-500','GHK-Cu'], bestFor:['Injury healing','Recovery','Anti-inflammation','Gut health'], eff:9, safe:9, notes:'Most studied healing peptide. One of the best starter peptides for beginners.', mechanism:'Upregulates growth hormone receptors; promotes angiogenesis and tendon/ligament repair.', beginnerNote:'BPC-157 is one of the safest and most forgiving peptides for beginners. Start at 250mcg once daily and see how you respond before increasing.', contraWith:[] },
+  'TB-500':{ alias:'Thymosin Beta-4', cat:'Healing', catBg:'#E1F5EE', catTxt:'#085041', route:'SubQ / IM', dose:'2–2.5 mg 2x/week (loading)', freq:'Twice weekly', half:'Long-acting', cycle:'4–6 weeks loading + maintenance', storage:'−20°C lyophilized', synergy:['BPC-157'], bestFor:['Recovery','Injury healing','Anti-inflammation','Endurance'], eff:8, safe:8, notes:'Works systemically. Pairs beautifully with BPC-157 as a healing stack.', mechanism:'Promotes actin polymerization; systemic anti-inflammatory and tissue remodeling.', beginnerNote:'TB-500 is intermediate-friendly but requires larger doses. Often combined with BPC-157 for enhanced healing.', contraWith:[] },
+  'GHK-Cu':{ alias:'Copper Peptide', cat:'Healing', catBg:'#E1F5EE', catTxt:'#085041', route:'SubQ / Topical', dose:'1–2 mg/day', freq:'Daily', half:'Unknown', cycle:'4–8 weeks', storage:'−20°C', synergy:['BPC-157'], bestFor:['Longevity','Anti-inflammation','Skin health'], eff:7, safe:9, notes:'Collagen synthesis and anti-aging profile. Safe for beginners.', mechanism:'Copper-binding peptide; stimulates collagen synthesis and antioxidant activity.', beginnerNote:'Very safe profile. Often used topically for skin benefits alongside SubQ for systemic effects.', contraWith:[] },
+  'CJC-1295':{ alias:'CJC-1295 DAC', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ', dose:'1–2 mg/week', freq:'Once weekly', half:'~6–8 days', cycle:'8–12 weeks', storage:'−20°C lyophilized', synergy:['Ipamorelin'], bestFor:['Muscle growth','Fat loss','Recovery','Sleep quality'], eff:9, safe:8, notes:'Always pair with a GHRP like Ipamorelin for best results.', mechanism:'GHRH analogue; stimulates pituitary GH release in a pulsatile pattern.', beginnerNote:'Best used with Ipamorelin. Inject once per week. You may notice deeper sleep and improved recovery within 2–3 weeks.', contraWith:['MK-677'] },
+  'Ipamorelin':{ alias:'Ipamorelin', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ', dose:'200–300 mcg/dose', freq:'2–3x daily fasted or pre-sleep', half:'~2h', cycle:'8–12 weeks', storage:'−20°C lyophilized', synergy:['CJC-1295'], bestFor:['Muscle growth','Fat loss','Sleep quality','Recovery'], eff:8, safe:9, notes:'Cleanest GHRP — minimal cortisol/prolactin. Best dosed pre-sleep.', mechanism:'Selective GHRP; triggers GH release without elevating cortisol or prolactin.', beginnerNote:'Administer on an empty stomach, ideally right before bed. You will likely notice improved sleep quality within the first week.', contraWith:[] },
+  'Sermorelin':{ alias:'GRF 1-29', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ', dose:'200–500 mcg/day', freq:'Once daily pre-sleep', half:'~10–20 min', cycle:'3–6 months', storage:'−20°C', synergy:['Ipamorelin'], bestFor:['Muscle growth','Fat loss','Sleep quality','Longevity'], eff:7, safe:9, notes:'Gentle GH stimulation. Great for older users or very cautious beginners.', mechanism:'First 29 amino acids of GHRH; naturally stimulates pituitary GH secretion.', beginnerNote:'One of the gentlest GH peptides available. Excellent starting point for people over 40.', contraWith:[] },
+  'MK-677':{ alias:'Ibutamoren / Nutrobal', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'Oral', dose:'10–25 mg/day', freq:'Once daily pre-sleep', half:'~24h', cycle:'3–6 months', storage:'Room temp', synergy:['Ipamorelin'], bestFor:['Muscle growth','Sleep quality','Recovery','Longevity'], eff:9, safe:7, notes:'Oral convenience. Can cause water retention and increased appetite.', mechanism:'Non-peptide GH secretagogue; orally active ghrelin receptor agonist.', beginnerNote:'Oral and convenient — no injections needed. Start at 10mg and increase if well tolerated. Water retention and hunger are common.', contraWith:['CJC-1295'] },
+  'AOD-9604':{ alias:'Anti-Obesity Drug 9604', cat:'GH Axis', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ', dose:'250–500 mcg/day', freq:'Once daily fasted AM', half:'Unknown', cycle:'12–16 weeks', storage:'−20°C', synergy:['Ipamorelin'], bestFor:['Fat loss'], eff:7, safe:9, notes:'Targeted fat loss only. No anabolic effects.', mechanism:'C-terminal fragment of hGH; stimulates lipolysis without IGF-1 effects.', beginnerNote:'Administer fasted in the morning for best results. Does not build muscle — purely fat loss focused.', contraWith:['CJC-1295'] },
+  'Semaglutide':{ alias:'Ozempic / Wegovy analogue', cat:'Metabolic', catBg:'#FAEEDA', catTxt:'#412402', route:'SubQ', dose:'0.25 mg/week → titrate to 2.4 mg/week', freq:'Once weekly', half:'~7 days', cycle:'Ongoing', storage:'2–8°C refrigerated', synergy:[], bestFor:['Fat loss','Metabolic health','Longevity'], eff:10, safe:7, notes:'Most clinically validated weight-loss peptide. Titrate slowly.', mechanism:'GLP-1 receptor agonist; reduces appetite, slows gastric emptying.', beginnerNote:'Start at 0.25mg/week and increase very slowly. GI side effects (nausea) are common in the first few weeks — titrating slowly minimizes this.', contraWith:['Retatrutide','Tirzepatide'] },
+  'Tirzepatide':{ alias:'Mounjaro analogue', cat:'Metabolic', catBg:'#FAEEDA', catTxt:'#412402', route:'SubQ', dose:'2.5 mg/week → titrate to 15 mg/week', freq:'Once weekly', half:'~5 days', cycle:'Ongoing', storage:'2–8°C refrigerated', synergy:[], bestFor:['Fat loss','Metabolic health'], eff:10, safe:7, notes:'Dual GIP/GLP-1 agonist. Superior weight loss to semaglutide in trials.', mechanism:'Dual GIP/GLP-1 receptor agonist.', beginnerNote:'Start very low and titrate slowly. Never combine with other GLP-1 class peptides.', contraWith:['Semaglutide','Retatrutide'] },
+  'Retatrutide':{ alias:'Triple agonist LY3437943', cat:'Metabolic', catBg:'#FAEEDA', catTxt:'#412402', route:'SubQ', dose:'1 mg/week → titrate to 12 mg/week', freq:'Once weekly', half:'~6 days', cycle:'Ongoing', storage:'2–8°C refrigerated', synergy:[], bestFor:['Fat loss','Metabolic health','Longevity'], eff:10, safe:6, notes:'Most potent metabolic peptide in research. ~24% weight loss in Phase 3.', mechanism:'Triple GLP-1/GIP/Glucagon receptor agonist.', beginnerNote:'Most powerful fat loss peptide available. Titrate very slowly. Not recommended as a first peptide.', contraWith:['Semaglutide','Tirzepatide'] },
+  'MOTS-c':{ alias:'Mitochondrial peptide MOTS-c', cat:'Metabolic', catBg:'#FAEEDA', catTxt:'#412402', route:'SubQ / IM', dose:'5–10 mg/week', freq:'2–3x weekly', half:'Unknown', cycle:'4–8 weeks', storage:'−20°C', synergy:['SS-31'], bestFor:['Fat loss','Endurance','Longevity','Metabolic health'], eff:8, safe:8, notes:'Exercise-mimetic. Activates AMPK.', mechanism:'Mitochondria-derived peptide; activates AMPK, improves metabolic flexibility.', beginnerNote:'Works synergistically with exercise. Best results seen when combined with regular training.', contraWith:[] },
+  'Semax':{ alias:'ACTH(4-7)-Pro-Gly-Pro', cat:'Cognitive', catBg:'#EEEDFE', catTxt:'#26215C', route:'Intranasal / SubQ', dose:'200–600 mcg/day', freq:'Once or twice daily', half:'~minutes', cycle:'2–4 weeks on / 2 off', storage:'−20°C; 2–8°C reconstituted 2 weeks', synergy:['Selank'], bestFor:['Cognitive performance','Focus','Neuroprotection'], eff:9, safe:9, notes:'Well-studied Russian nootropic. Strong BDNF boost.', mechanism:'ACTH analogue; increases BDNF, upregulates dopamine and serotonin.', beginnerNote:'Intranasal administration is easy and comfortable. Effects on focus and clarity are often noticeable within days.', contraWith:[] },
+  'Selank':{ alias:'Tuftsin analogue', cat:'Cognitive', catBg:'#EEEDFE', catTxt:'#26215C', route:'Intranasal', dose:'250–500 mcg/day', freq:'Once or twice daily', half:'~minutes', cycle:'2–4 weeks', storage:'2–8°C reconstituted', synergy:['Semax'], bestFor:['Cognitive performance','Sleep quality','Mood'], eff:8, safe:10, notes:'One of the safest nootropic peptides. Pairs perfectly with Semax.', mechanism:'Anxiolytic; modulates GABA-A, increases enkephalin and BDNF.', beginnerNote:'Extremely safe — one of the best first cognitive peptides. Calming without sedation. Great for anxiety and mental clarity.', contraWith:[] },
+  'Dihexa':{ alias:'PNB-0408', cat:'Cognitive', catBg:'#EEEDFE', catTxt:'#26215C', route:'Oral / Topical', dose:'10–30 mg/week oral', freq:'2–3x weekly', half:'Unknown', cycle:'4–8 weeks', storage:'−20°C', synergy:['Semax'], bestFor:['Cognitive performance','Neuroprotection'], eff:9, safe:6, notes:'Extraordinarily potent. Start very low. Not for beginners.', mechanism:'HGF/c-Met superagonist; promotes synaptogenesis.', beginnerNote:'Not recommended for beginners. Reported to be very potent — start with a fraction of the standard dose.', contraWith:[] },
+  'Epithalon':{ alias:'Epitalon', cat:'Longevity', catBg:'#EAF3DE', catTxt:'#173404', route:'SubQ / IM', dose:'5–10 mg/day', freq:'Daily for 10–20 days', half:'Unknown', cycle:'10–20 day courses 2–3x/year', storage:'−20°C lyophilized', synergy:['Thymalin'], bestFor:['Longevity','Sleep quality','Anti-aging'], eff:9, safe:9, notes:'Decades of Russian longevity research. Telomerase activator.', mechanism:'Activates telomerase; regulates melatonin and circadian rhythm.', beginnerNote:'Run as a 10–20 day course rather than daily indefinitely. Many users report dramatically improved sleep within the first few days.', contraWith:[] },
+  'Thymalin':{ alias:'Thymus peptide complex', cat:'Longevity', catBg:'#EAF3DE', catTxt:'#173404', route:'SubQ / IM', dose:'5–10 mg/day', freq:'Daily for 10 days', half:'Unknown', cycle:'10-day courses 1–2x/year', storage:'−20°C', synergy:['Epithalon'], bestFor:['Longevity','Immune support'], eff:8, safe:9, notes:'Restores thymic function and immune competence.', mechanism:'Thymus-derived peptide; restores immune competence.', beginnerNote:'Pair with Epithalon for the classic Russian longevity protocol. Run once or twice per year.', contraWith:[] },
+  'DSIP':{ alias:'Delta Sleep-Inducing Peptide', cat:'Sleep', catBg:'#EAF3DE', catTxt:'#173404', route:'SubQ', dose:'100–300 mcg/night', freq:'As needed pre-sleep', half:'~30–60 min', cycle:'As needed', storage:'−20°C', synergy:['Epithalon'], bestFor:['Sleep quality','Recovery'], eff:7, safe:9, notes:'Non-habit forming. Great for stress-related insomnia.', mechanism:'Neuropeptide that promotes slow-wave sleep.', beginnerNote:'Use as needed rather than daily. Non-addictive. Administer 30 minutes before bed.', contraWith:[] },
+  'PT-141':{ alias:'Bremelanotide', cat:'Sexual Health', catBg:'#FBEAF0', catTxt:'#4B1528', route:'SubQ / Intranasal', dose:'0.5–2 mg as needed', freq:'As needed 1–2h pre-activity', half:'~6–8h', cycle:'Max 2x weekly', storage:'−20°C lyophilized', synergy:[], bestFor:['Libido / hormonal health'], eff:9, safe:7, notes:'FDA-approved for female HSDD. Start at 0.5mg — nausea common at higher doses.', mechanism:'Melanocortin receptor agonist; centrally acting.', beginnerNote:'Start at the lowest dose (0.5mg). Nausea is the most common side effect and is dose-dependent — lower dose = less nausea.', contraWith:[] },
+  'SS-31':{ alias:'Elamipretide', cat:'Performance', catBg:'#E6F1FB', catTxt:'#042C53', route:'SubQ', dose:'0.05–0.25 mg/kg/day', freq:'Daily', half:'Unknown', cycle:'4–8 weeks', storage:'−20°C', synergy:['MOTS-c'], bestFor:['Endurance','Recovery','Longevity'], eff:8, safe:8, notes:'Mitochondrial medicine. Restores ATP and reduces oxidative stress.', mechanism:'Targets cardiolipin in inner mitochondrial membrane.', beginnerNote:'Dose by body weight. Start at the lower end. Often combined with MOTS-c for comprehensive mitochondrial support.', contraWith:[] },
+  'VIP':{ alias:'Vasoactive Intestinal Peptide', cat:'Immune', catBg:'#EAF3DE', catTxt:'#173404', route:'Intranasal / SubQ', dose:'25–50 mcg 2x daily', freq:'Twice daily', half:'~2 min IV', cycle:'12 weeks', storage:'−20°C', synergy:['BPC-157'], bestFor:['Anti-inflammation','Immune support'], eff:8, safe:7, notes:'Used in CIRS/mold illness protocols.', mechanism:'Pleiotropic neuropeptide; anti-inflammatory and immunomodulatory.', beginnerNote:'Often used for chronic inflammatory conditions. Intranasal is the most practical route.', contraWith:[] },
+  'KPV':{ alias:'Lysine-Proline-Valine', cat:'Healing', catBg:'#E1F5EE', catTxt:'#085041', route:'Oral / SubQ', dose:'100–500 mcg/day', freq:'Daily', half:'Short', cycle:'4–8 weeks', storage:'−20°C', synergy:['BPC-157'], bestFor:['Anti-inflammation','Gut health'], eff:7, safe:9, notes:'Excellent for gut inflammation. Often combined with BPC-157.', mechanism:'Alpha-MSH fragment; anti-inflammatory via NF-κB pathway.', beginnerNote:'Often used orally for gut issues. Very safe profile. Combine with BPC-157 for powerful gut healing protocol.', contraWith:[] },
+  'Cerebrolysin':{ alias:'FPE 1070', cat:'Cognitive', catBg:'#EEEDFE', catTxt:'#26215C', route:'IM / IV', dose:'5–10 ml/day', freq:'Daily for 10–20 days', half:'Unknown', cycle:'10–20 day courses', storage:'2–8°C', synergy:['Semax'], bestFor:['Cognitive performance','Neuroprotection'], eff:9, safe:7, notes:'Clinically used in Europe. IV preferred for cognitive enhancement.', mechanism:'Multi-target neuropeptide mixture; neurotrophic via BDNF/NGF pathways.', beginnerNote:'Requires IM or IV administration. IV is preferred but requires medical supervision. Run as a course rather than ongoing.', contraWith:[] },
+};
+
+const CONFLICTS = {
+  'Retatrutide+Semaglutide':{ sev:'high', msg:'Both GLP-1 agonists — severe GI toxicity, hypoglycemia, pancreatitis risk. Never combine.' },
+  'Retatrutide+Tirzepatide':{ sev:'high', msg:'Both target GLP-1/GIP receptors. Dangerous additive effects. Never combine.' },
+  'Semaglutide+Tirzepatide':{ sev:'high', msg:'Both GLP-1 agonists — severe side effects. Never combine.' },
+  'CJC-1295+MK-677':{ sev:'moderate', msg:'Both raise GH. May cause excessive GH, insulin resistance, water retention. Use one or the other.' },
+  'AOD-9604+CJC-1295':{ sev:'moderate', msg:'AOD-9604 is a GH fragment; CJC-1295 raises full GH. Risk of excessive downstream signaling.' },
+};
+
+const SYNERGIES = [
+  { pair:['BPC-157','TB-500'], note:'Gold-standard healing stack.' },
+  { pair:['CJC-1295','Ipamorelin'], note:'Classic GHRH + GHRP synergy for GH release.' },
+  { pair:['Semax','Selank'], note:'Balanced nootropic — BDNF + anxiolytic.' },
+  { pair:['Epithalon','Thymalin'], note:'Russian longevity protocol.' },
+  { pair:['MOTS-c','SS-31'], note:'Dual mitochondrial optimization.' },
+];
+
+const COMMUNITY_STACKS = [
+  { goals:'Fat loss + muscle growth', exp:'Intermediate', peptides:['CJC-1295','Ipamorelin','AOD-9604'], rating:5, reviews:23, weeks:12, note:'Lost 18lbs of fat while gaining lean mass. Sleep improved dramatically in week 2.' },
+  { goals:'Recovery + injury healing', exp:'Beginner', peptides:['BPC-157','TB-500'], rating:5, reviews:41, weeks:8, note:'Healed a 6-month shoulder issue in 6 weeks. BPC-157 is incredible.' },
+  { goals:'Cognitive performance', exp:'Intermediate', peptides:['Semax','Selank'], rating:4, reviews:18, weeks:4, note:'Noticeable focus improvement by day 3. Selank takes the edge off anxiety.' },
+  { goals:'Longevity', exp:'Advanced', peptides:['Epithalon','Thymalin','GHK-Cu'], rating:5, reviews:12, weeks:0, note:'Run this protocol twice a year. Energy and sleep quality noticeably better.' },
+  { goals:'Fat loss', exp:'Beginner', peptides:['Semaglutide'], rating:4, reviews:67, weeks:16, note:'Down 32lbs in 4 months. Nausea first 2 weeks then went away completely.' },
+  { goals:'Sleep + recovery', exp:'Beginner', peptides:['MK-677','DSIP'], rating:4, reviews:29, weeks:8, note:'Best sleep of my life on week 3. Woke up recovered every day.' },
+];
+
+const SUGGESTED_QS = [
+  'What is BPC-157 and is it safe for beginners?',
+  'How do I reconstitute a peptide vial?',
+  'What is the difference between SubQ and IM injection?',
+  'Can I stack BPC-157 and TB-500 together?',
+  'What peptides are best for fat loss?',
+  'How do I use a U-100 insulin syringe?',
+  'What are the side effects of Ipamorelin?',
+  'How long before I see results from peptides?',
+];
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+const S = {
+  goals: new Set(), exp:'beginner', compareItems: new Set(),
+  cycle:'4', pattern:'5on2off', lastResult:'', lastGoals:'',
+  history: JSON.parse(localStorage.getItem('pg_h')||'[]'),
+  journal: JSON.parse(localStorage.getItem('pg_j')||'[]'),
+  vials: JSON.parse(localStorage.getItem('pg_v')||'[]'),
+  injLog: JSON.parse(localStorage.getItem('pg_i')||'[]'),
+  chatHistory: [],
+  wizAnswers: {},
+  wizStep: 0,
+};
+
+const PAGE_META = {
+  wizard:    { title:'Start here', sub:'Build your first research peptide stack in 2 minutes' },
+  generator: { title:'Stack generator', sub:'Select goals and generate a personalized research protocol' },
+  chat:      { title:'Ask PIN AI', sub:'Get instant answers to any peptide question' },
+  database:  { title:'Peptide database', sub:`${Object.keys(PEPTIDES).length} research peptides with full protocol data` },
+  compare:   { title:'Compare peptides', sub:'Side-by-side comparison with conflict and synergy detection' },
+  calculator:{ title:'Dosing calculator', sub:'Reconstitution math + syringe measurement + protocol timeline' },
+  journal:   { title:'Cycle journal', sub:'Track your weekly results, energy, sleep and body composition' },
+  vials:     { title:'Vial tracker', sub:'Track doses remaining, reconstitution dates, and expiry warnings' },
+  rotator:   { title:'Injection site rotator', sub:'Log injection sites and rotate to prevent tissue damage' },
+  community: { title:'Community stack feed', sub:'Real stacks from real users — sorted by goals and ratings' },
+  history:   { title:'My saved stacks', sub:'Previously generated and saved research protocols' },
+};
+
+// ══════════════════════════════════════
+// NAV
+// ══════════════════════════════════════
+window.show = function(id) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{ if(n.getAttribute('onclick')?.includes("'"+id+"'")) n.classList.add('active'); });
+  const m = PAGE_META[id];
+  document.getElementById('pageTitle').textContent = m.title;
+  document.getElementById('pageSub').textContent = m.sub;
+  document.getElementById('pageActions').innerHTML = '';
+  if(id==='calculator') renderTimeline();
+  if(id==='history') renderHistory();
+  if(id==='database') renderDB();
+  if(id==='community') renderCommunity();
+  if(id==='journal') renderJournal();
+  if(id==='vials') renderVials();
+  if(id==='chat') renderSuggestedQs();
+};
+
+// ══════════════════════════════════════
+// WIZARD
+// ══════════════════════════════════════
+const WIZ_STEPS = [
+  { q:'What are you hoping to achieve?', sub:'Select everything that applies to you.', type:'multi', key:'goals', options:[
+    { icon:'🔥', label:'Fat loss', val:'Fat loss' },
+    { icon:'💪', label:'Muscle growth', val:'Muscle growth' },
+    { icon:'🧠', label:'Cognitive performance', val:'Cognitive performance' },
+    { icon:'⚡', label:'Energy & endurance', val:'Endurance' },
+    { icon:'😴', label:'Sleep quality', val:'Sleep quality' },
+    { icon:'🩹', label:'Injury healing', val:'Injury healing' },
+    { icon:'⏳', label:'Longevity', val:'Longevity' },
+    { icon:'🔥', label:'Anti-inflammation', val:'Anti-inflammation' },
+  ]},
+  { q:'Have you ever used research peptides before?', sub:'Be honest — this determines the safety of your recommendations.', type:'single', key:'experience', options:[
+    { icon:'🌱', label:'No, this is my first time', val:'beginner' },
+    { icon:'📚', label:'A little — I\'ve done some research', val:'beginner-informed' },
+    { icon:'⚗️', label:'Yes — I\'ve used peptides before', val:'intermediate' },
+    { icon:'🔬', label:'Experienced researcher', val:'advanced' },
+  ]},
+  { q:'How comfortable are you with injections?', sub:'This helps us recommend the right administration routes.', type:'single', key:'inject', options:[
+    { icon:'😰', label:'Not at all — prefer no injections', val:'oral' },
+    { icon:'🤔', label:'A little nervous but willing to learn', val:'subq-nervous' },
+    { icon:'✅', label:'Fine with SubQ (small insulin needle)', val:'subq' },
+    { icon:'💪', label:'Comfortable with any injection', val:'any' },
+  ]},
+  { q:'What\'s your monthly budget for research?', sub:'Helps us recommend cost-effective protocols.', type:'single', key:'budget', options:[
+    { icon:'💵', label:'Under $100/month', val:'low' },
+    { icon:'💴', label:'$100–250/month', val:'mid' },
+    { icon:'💳', label:'$250–500/month', val:'high' },
+    { icon:'🏦', label:'Budget is not a concern', val:'unlimited' },
+  ]},
+  { q:'Tell us a bit about yourself', sub:'Optional but helps personalize your stack.', type:'fields', key:'profile' },
+  { q:'Ready to generate your stack!', sub:'Based on your answers we\'ll create a beginner-safe personalized protocol.', type:'confirm', key:'confirm' },
+];
+
+function initWizard() {
+  S.wizStep = 0; S.wizAnswers = {};
+  renderWizStep();
+}
+
+function renderWizStep() {
+  const step = WIZ_STEPS[S.wizStep];
+  const total = WIZ_STEPS.length;
+  document.getElementById('wizStepBadge').textContent = `Step ${S.wizStep+1} of ${total}`;
+  const prog = document.getElementById('wizProgress');
+  prog.innerHTML = WIZ_STEPS.map((_,i)=>`<div class="wiz-dot ${i<=S.wizStep?'done':''}"></div>`).join('');
+
+  let html = `<div class="wiz-question">${step.q}</div><div class="wiz-sub">${step.sub}</div>`;
+
+  if(step.type==='multi' || step.type==='single') {
+    html += `<div class="wiz-options">`;
+    step.options.forEach(o => {
+      const sel = S.wizAnswers[step.key] && (Array.isArray(S.wizAnswers[step.key]) ? S.wizAnswers[step.key].includes(o.val) : S.wizAnswers[step.key]===o.val);
+      html += `<div class="wiz-option ${sel?'selected':''}" onclick="wizSelect('${step.key}','${o.val}','${step.type}')"><span class="wiz-option-icon">${o.icon}</span>${o.label}</div>`;
+    });
+    html += `</div>`;
+  } else if(step.type==='fields') {
+    html += `<div class="row2">
+      <div class="field"><label>Age (optional)</label><input type="number" id="wizAge" placeholder="e.g. 35" value="${S.wizAnswers.age||''}"/></div>
+      <div class="field"><label>Biological sex (optional)</label><select id="wizSex"><option value="">Prefer not to say</option><option value="male" ${S.wizAnswers.sex==='male'?'selected':''}>Male</option><option value="female" ${S.wizAnswers.sex==='female'?'selected':''}>Female</option></select></div>
+    </div>
+    <div class="field"><label>Anything else we should know?</label><textarea id="wizContext" placeholder="e.g. recovering from knee surgery, diabetic, on TRT...">${S.wizAnswers.context||''}</textarea></div>`;
+  } else if(step.type==='confirm') {
+    const goals = (S.wizAnswers.goals||[]).join(', ') || 'Not specified';
+    const exp = S.wizAnswers.experience || 'beginner';
+    html += `<div class="alert-teal" style="margin-bottom:0;">
+      <strong>Your profile summary:</strong><br>
+      Goals: ${goals}<br>
+      Experience: ${exp}<br>
+      Injection comfort: ${S.wizAnswers.inject||'any'}<br>
+      Budget: ${S.wizAnswers.budget||'mid'}
+      ${S.wizAnswers.age?'<br>Age: '+S.wizAnswers.age:''}
+    </div>`;
+  }
+
+  html += `<div class="wizard-nav">
+    <button class="btn btn-outline ${S.wizStep===0?'':''}btn-sm" onclick="wizBack()" ${S.wizStep===0?'style="visibility:hidden"':''}>← Back</button>
+    <button class="btn btn-primary btn-sm" onclick="wizNext()">${S.wizStep===total-1?'Generate my stack →':'Continue →'}</button>
+  </div>`;
+
+  document.getElementById('wizContent').innerHTML = html;
+}
+
+window.wizSelect = function(key, val, type) {
+  if(type==='multi') {
+    if(!S.wizAnswers[key]) S.wizAnswers[key]=[];
+    const idx = S.wizAnswers[key].indexOf(val);
+    if(idx>-1) S.wizAnswers[key].splice(idx,1); else S.wizAnswers[key].push(val);
+  } else { S.wizAnswers[key]=val; }
+  renderWizStep();
+};
+
+window.wizBack = function() { if(S.wizStep>0){S.wizStep--;renderWizStep();} };
+
+window.wizNext = async function() {
+  const step = WIZ_STEPS[S.wizStep];
+  if(step.type==='fields') {
+    S.wizAnswers.age = document.getElementById('wizAge')?.value;
+    S.wizAnswers.sex = document.getElementById('wizSex')?.value;
+    S.wizAnswers.context = document.getElementById('wizContext')?.value;
+  }
+  if(S.wizStep<WIZ_STEPS.length-1) { S.wizStep++; renderWizStep(); return; }
+  await runWizardGenerate();
+};
+
+async function runWizardGenerate() {
+  document.getElementById('wizResult').style.display='block';
+  const body = document.getElementById('wizResultBody');
+  body.className='result-text loading'; body.textContent='Building your personalized beginner stack...';
+  document.getElementById('wizContent').innerHTML='<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">✓ Answers recorded — generating below...</div>';
+
+  const goals = (S.wizAnswers.goals||['General health']).join(', ');
+  const exp = S.wizAnswers.experience||'beginner';
+  const inject = S.wizAnswers.inject||'any';
+  const budget = S.wizAnswers.budget||'mid';
+
+  const prompt = `You are PIN, a friendly expert peptide advisor. The user is a ${exp} who has just completed our onboarding wizard.
+
+Profile:
+- Goals: ${goals}
+- Experience: ${exp}
+- Injection comfort: ${inject}
+- Budget: ${budget}
+${S.wizAnswers.age?'- Age: '+S.wizAnswers.age:''}${S.wizAnswers.sex?'\n- Sex: '+S.wizAnswers.sex:''}
+${S.wizAnswers.context?'- Context: '+S.wizAnswers.context:''}
+
+Generate a BEGINNER-SAFE starter stack. Use plain English throughout — no jargon. Explain everything as if talking to someone who has never used peptides.
+
+Use this format:
+
+🌱 YOUR BEGINNER STARTER STACK
+
+For each peptide (maximum 3 for beginners):
+▸ [NAME] — [one-sentence plain English description of what it does]
+  Start with: [beginner starting dose]
+  How to take it: [plain English instructions]
+  When you'll notice results: [realistic timeline]
+  
+💡 WHY THESE PEPTIDES
+[2-3 sentences explaining why this stack fits their goals, in plain English]
+
+📋 WEEK 1 CHECKLIST
+- [5 practical first-week action items]
+
+⚠️ IMPORTANT SAFETY NOTES
+[2-3 key safety points for a beginner]
+
+Keep the tone warm, encouraging, and non-intimidating. This person is new and may be nervous.`;
+
+  try {
+    const res = await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data = await res.json();
+    const text = data.content?.map(b=>b.text||'').join('')||'Error generating stack.';
+    body.className='result-text'; body.textContent=text;
+    S.lastResult=text; S.lastGoals=goals;
+  } catch(e) { body.className='result-text'; body.textContent='Connection error. Please check your API key in Vercel settings.'; }
+}
+
+window.saveWizResult = function() { saveStack(); };
+initWizard();
+
+// ══════════════════════════════════════
+// GENERATOR
+// ══════════════════════════════════════
+const GOALS = ['Fat loss','Muscle growth','Recovery','Endurance','Cognitive performance','Sleep quality','Longevity','Libido / hormonal health','Anti-inflammation','Injury healing','Immune support','Metabolic health'];
+const gg = document.getElementById('goalGrid');
+GOALS.forEach(g=>{
+  const el=document.createElement('div'); el.className='chip'; el.dataset.g=g;
+  el.innerHTML=`<div class="chip-dot"></div>${g}`;
+  el.onclick=()=>{ S.goals.has(g)?(S.goals.delete(g),el.classList.remove('on')):(S.goals.add(g),el.classList.add('on')); };
+  gg.appendChild(el);
+});
+document.querySelectorAll('#expPills .pill').forEach(p=>{
+  p.onclick=()=>{ document.querySelectorAll('#expPills .pill').forEach(x=>x.classList.remove('on')); p.classList.add('on'); S.exp=p.dataset.e; };
+});
+
+window.generate = async function() {
+  if(!S.goals.size){toast('Select at least one goal');return;}
+  const btn=document.getElementById('genBtn');
+  const card=document.getElementById('resultCard');
+  const body=document.getElementById('resultBody');
+  btn.disabled=true; btn.textContent='Generating...';
+  card.style.display='block';
+  body.className='result-text loading'; body.textContent='Analyzing your goals and composing a research stack...';
+  document.getElementById('conflictSection').innerHTML='';
+  document.getElementById('synergySection').innerHTML='';
+  document.getElementById('resultBadges').innerHTML='<span class="badge badge-teal">Research only</span>';
+
+  const goals=[...S.goals].join(', ');
+  const age=document.getElementById('age').value;
+  const sex=document.getElementById('sex').value;
+  const budget=document.getElementById('budget').value;
+  const inject=document.getElementById('inject').value;
+  const extra=document.getElementById('extra').value.trim();
+  const pepList=Object.entries(PEPTIDES).map(([n,p])=>`${n} (${p.cat}): ${p.bestFor.join(', ')}`).join('\n');
+
+  const prompt=`You are PIN, an expert research peptide advisor (educational only).
+
+AVAILABLE PEPTIDES:
+${pepList}
+
+USER PROFILE:
+- Goals: ${goals}
+- Experience: ${S.exp}
+${age?'- Age: '+age:''}${sex?'\n- Sex: '+sex:''}
+${budget?'- Budget: '+budget:''}
+${inject?'- Injection comfort: '+inject:''}
+${extra?'- Context: '+extra:''}
+
+Generate a stack using ONLY peptides from the list above. Tailor complexity to experience level (${S.exp} users need more explanation and simpler stacks). Format:
+
+═══ RECOMMENDED STACK ═══
+For each peptide:
+▸ [NAME]
+  Purpose: [why it fits this user]
+  Research dose: [specific dose]
+  Timing: [when/how]
+  Cycle: [length and pattern]
+
+═══ PROTOCOL SYNERGIES ═══
+[2-3 sentences on how these peptides work together]
+
+═══ ADMINISTRATION NOTES ═══
+[Reconstitution, storage, injection tips, timing relative to food/sleep/exercise]
+
+═══ CONTRAINDICATIONS ═══
+[Any conflicts, or: None identified.]
+
+═══ ${S.exp.toUpperCase()} USER GUIDANCE ═══
+[2-3 sentences tailored to their experience]`;
+
+  try {
+    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message||data.error);
+    const text=data.content?.map(b=>b.text||'').join('')||'No response.';
+    body.className='result-text'; body.textContent=text;
+    S.lastResult=text; S.lastGoals=goals;
+
+    const cm=text.match(/CONTRAINDICATIONS\s*═+\s*([\s\S]*?)(?:═══|$)/i);
+    if(cm&&cm[1]&&!cm[1].toLowerCase().includes('none identified')) {
+      document.getElementById('conflictSection').innerHTML=`<div class="alert-box alert-red"><strong>⚠ Conflicts noted:</strong><br>${cm[1].trim()}</div>`;
+      document.getElementById('resultBadges').innerHTML+='<span class="badge badge-amber" style="margin-left:6px;">⚠ Conflicts</span>';
+    }
+    const mentioned=Object.keys(PEPTIDES).filter(n=>text.includes(n));
+    SYNERGIES.filter(s=>s.pair.every(p=>mentioned.includes(p))).forEach(s=>{
+      document.getElementById('synergySection').innerHTML+=`<div class="alert-box alert-teal"><strong>✓ Synergy:</strong> ${s.note}</div>`;
+    });
+  } catch(e) {
+    body.className='result-text';
+    body.textContent='Error: '+(e.message||'Connection failed. Ensure ANTHROPIC_API_KEY is set in Vercel environment variables.');
+  }
+  btn.disabled=false; btn.textContent='Generate my peptide stack';
+};
+
+window.shareStack = function() {
+  if(!S.lastResult){toast('Generate a stack first');return;}
+  const url=window.location.href.split('?')[0]+'?stack='+encodeURIComponent(S.lastGoals);
+  navigator.clipboard?.writeText(url).then(()=>toast('Link copied to clipboard ✓')).catch(()=>toast('Copy this URL to share: '+url));
+};
+
+// ══════════════════════════════════════
+// SAVE / HISTORY
+// ══════════════════════════════════════
+window.saveStack = function() {
+  if(!S.lastResult){toast('Generate a stack first');return;}
+  S.history.unshift({id:Date.now(),goals:S.lastGoals,exp:S.exp,text:S.lastResult,date:new Date().toLocaleDateString()});
+  localStorage.setItem('pg_h',JSON.stringify(S.history.slice(0,20)));
+  toast('Stack saved ✓');
+};
+
+window.clearHistory = function() {
+  if(!confirm('Clear all saved stacks?')) return;
+  S.history.length=0; localStorage.removeItem('pg_h'); renderHistory();
+};
+
+function renderHistory() {
+  const el=document.getElementById('historyList');
+  if(!S.history.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div>No saved stacks yet.</div>';return;}
+  el.innerHTML=S.history.map((h,i)=>`<div class="journal-week" onclick="loadHistory(${i})" style="cursor:pointer;">
+    <div class="journal-week-head"><div class="journal-week-title">${h.goals}</div><span class="badge badge-gray">${h.exp} · ${h.date}</span></div>
+    <div style="font-size:12px;color:var(--text3);">${h.text.substring(0,120)}...</div>
+  </div>`).join('');
+}
+
+window.loadHistory = function(i) {
+  show('generator');
+  document.getElementById('resultCard').style.display='block';
+  document.getElementById('resultBody').className='result-text';
+  document.getElementById('resultBody').textContent=S.history[i].text;
+  S.lastResult=S.history[i].text; S.lastGoals=S.history[i].goals;
+};
+
+// ══════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════
+function renderSuggestedQs() {
+  const el=document.getElementById('suggestedQs');
+  el.innerHTML=SUGGESTED_QS.map(q=>`<div class="pill" style="cursor:pointer;" onclick="askSuggested('${q.replace(/'/g,"\\'")}')">${q}</div>`).join('');
+}
+
+window.askSuggested = function(q) {
+  document.getElementById('chatInput').value=q;
+  sendChat();
+};
+
+window.sendChat = async function() {
+  const input=document.getElementById('chatInput');
+  const msg=input.value.trim();
+  if(!msg) return;
+  input.value='';
+
+  const msgs=document.getElementById('chatMessages');
+  msgs.innerHTML+=`<div class="chat-msg user"><div class="chat-sender">You</div><div class="chat-bubble">${msg}</div></div>`;
+  S.chatHistory.push({role:'user',content:msg});
+  msgs.innerHTML+=`<div class="chat-msg ai" id="chatThinking"><div class="chat-sender">PIN AI</div><div class="chat-bubble" style="color:var(--text3);font-style:italic;">Thinking...</div></div>`;
+  msgs.scrollTop=msgs.scrollHeight;
+
+  const systemPrompt=`You are PIN AI, a friendly and knowledgeable research peptide advisor. You specialize in explaining peptides clearly to beginners while also being able to go deep for advanced users. Always:
+- Use plain English and explain any technical terms
+- Be warm and non-intimidating, especially with beginners
+- Give practical, actionable answers
+- Remind users that peptides are research chemicals for educational purposes only and to consult a healthcare provider
+- Never recommend anything dangerous
+Keep responses concise but thorough.`;
+
+  try {
+    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:systemPrompt,messages:S.chatHistory.slice(-10)})});
+    const data=await res.json();
+    const reply=data.content?.map(b=>b.text||'').join('')||'Sorry, I had trouble responding.';
+    S.chatHistory.push({role:'assistant',content:reply});
+    document.getElementById('chatThinking').innerHTML=`<div class="chat-sender">PIN AI</div><div class="chat-bubble">${reply.replace(/\n/g,'<br>')}</div>`;
+  } catch(e) {
+    document.getElementById('chatThinking').innerHTML=`<div class="chat-sender">PIN AI</div><div class="chat-bubble" style="color:var(--red);">Connection error. Please try again.</div>`;
+  }
+  msgs.scrollTop=msgs.scrollHeight;
+};
+
+// ══════════════════════════════════════
+// DATABASE
+// ══════════════════════════════════════
+const cats=[...new Set(Object.values(PEPTIDES).map(p=>p.cat))];
+const catSel=document.getElementById('dbCat');
+cats.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;catSel.appendChild(o);});
+document.getElementById('dbCount').textContent=`${Object.keys(PEPTIDES).length} peptides`;
+
+window.renderDB = function() {
+  const q=(document.getElementById('dbSearch')?.value||'').toLowerCase();
+  const cat=document.getElementById('dbCat')?.value||'';
+  const tbody=document.getElementById('dbBody');
+  if(!tbody) return;
+  const filtered=Object.entries(PEPTIDES).filter(([n,p])=>
+    (!q||n.toLowerCase().includes(q)||p.alias.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)||p.bestFor.some(b=>b.toLowerCase().includes(q)))&&
+    (!cat||p.cat===cat)
+  );
+  tbody.innerHTML=filtered.map(([n,p])=>`<tr onclick="showPepDetail('${n}')">
+    <td><div class="pep-name">${n}</div><div class="pep-alias">${p.alias}</div></td>
+    <td><span class="tag" style="background:${p.catBg};color:${p.catTxt};">${p.cat}</span></td>
+    <td style="font-size:12px;color:var(--text2);">${p.bestFor.slice(0,2).join(', ')}</td>
+    <td style="font-size:12px;">${p.route}</td>
+    <td style="font-size:12px;">${p.dose}</td>
+    <td><div class="progress-bar" style="width:60px;"><div class="progress-fill" style="width:${p.safe*10}%;background:${p.safe>=8?'#1D9E75':p.safe>=6?'#F59E0B':'#EF4444'};"></div></div></td>
+  </tr>`).join('');
+};
+
+window.showPepDetail = function(name) {
+  const p=PEPTIDES[name];
+  const card=document.getElementById('pepDetailCard');
+  card.style.display='block';
+  card.innerHTML=`
+    <div class="pep-page-hero">
+      <div class="pep-page-name">${name}</div>
+      <div class="pep-page-alias">${p.alias}</div>
+      <div class="pep-page-tags">
+        <span class="tag" style="background:${p.catBg};color:${p.catTxt};">${p.cat}</span>
+        ${p.bestFor.map(b=>`<span class="tag" style="background:var(--g100);color:var(--text2);">${b}</span>`).join('')}
+      </div>
+      <div class="pep-page-summary">${p.notes}</div>
+    </div>
+    <div class="pep-beginners-box">
+      <h4>👋 Beginner's guide to ${name}</h4>
+      <p>${p.beginnerNote}</p>
+    </div>
+    <div class="pep-detail-grid">
+      <div class="pep-detail-card"><div class="pep-detail-label">Research dose</div><div class="pep-detail-val">${p.dose}</div></div>
+      <div class="pep-detail-card"><div class="pep-detail-label">Route</div><div class="pep-detail-val">${p.route}</div></div>
+      <div class="pep-detail-card"><div class="pep-detail-label">Half-life</div><div class="pep-detail-val">${p.half}</div></div>
+      <div class="pep-detail-card"><div class="pep-detail-label">Frequency</div><div class="pep-detail-val">${p.freq}</div></div>
+      <div class="pep-detail-card"><div class="pep-detail-label">Cycle length</div><div class="pep-detail-val">${p.cycle}</div></div>
+      <div class="pep-detail-card"><div class="pep-detail-label">Storage</div><div class="pep-detail-val" style="font-size:12px;">${p.storage}</div></div>
+    </div>
+    <div class="pep-section"><h3>How it works</h3><p>${p.mechanism}</p></div>
+    ${p.synergy?.length?`<div class="pep-section"><h3>Works well with</h3><p>${p.synergy.map(s=>`<strong>${s}</strong>`).join(' and ')} — these peptides complement ${name} for enhanced results.</p></div>`:''}
+    ${p.contraWith?.length?`<div class="alert-box alert-red"><strong>⚠ Do not combine with:</strong> ${p.contraWith.join(', ')}</div>`:''}
+    <div style="margin-top:14px;display:flex;gap:8px;">
+      <button class="btn btn-primary btn-sm" onclick="prefillGenerator('${name}')">Generate stack with ${name}</button>
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('pepDetailCard').style.display='none'">Close</button>
+    </div>`;
+  card.scrollIntoView({behavior:'smooth'});
+};
+
+window.prefillGenerator = function(name) {
+  const p=PEPTIDES[name];
+  p.bestFor.forEach(g=>{
+    S.goals.add(g);
+    document.querySelectorAll('#goalGrid .chip').forEach(c=>{ if(c.dataset.g===g) c.classList.add('on'); });
+  });
+  show('generator');
+};
+
+// ══════════════════════════════════════
+// COMPARE
+// ══════════════════════════════════════
+const cc=document.getElementById('compareChips');
+Object.keys(PEPTIDES).forEach(name=>{
+  const p=PEPTIDES[name];
+  const el=document.createElement('div'); el.className='chip';
+  el.innerHTML=`<div class="chip-dot"></div>${name}`;
+  el.onclick=()=>{ S.compareItems.has(name)?(S.compareItems.delete(name),el.classList.remove('on')):(S.compareItems.add(name),el.classList.add('on')); document.getElementById('cmpCount').textContent=`${S.compareItems.size} selected`; };
+  cc.appendChild(el);
+});
+
+window.runCompare = function() {
+  if(S.compareItems.size<2){toast('Select at least 2 peptides');return;}
+  const items=[...S.compareItems];
+  const el=document.getElementById('compareResults');
+  let html='<div class="compare-grid">';
+  items.forEach((name,idx)=>{
+    const p=PEPTIDES[name];
+    html+=`<div class="compare-card ${idx===0?'featured':''}">
+      ${idx===0?'<div style="margin-bottom:8px;"><span class="badge badge-teal">First selected</span></div>':''}
+      <div class="compare-card-name">${name}</div>
+      <div style="margin-bottom:9px;"><span class="tag" style="background:${p.catBg};color:${p.catTxt};">${p.cat}</span></div>
+      <div class="compare-row"><span class="ckey">Route</span><span class="cval">${p.route}</span></div>
+      <div class="compare-row"><span class="ckey">Dose</span><span class="cval">${p.dose}</span></div>
+      <div class="compare-row"><span class="ckey">Half-life</span><span class="cval">${p.half}</span></div>
+      <div class="compare-row"><span class="ckey">Cycle</span><span class="cval">${p.cycle}</span></div>
+      <div class="compare-row"><span class="ckey">Storage</span><span class="cval" style="font-size:10px;">${p.storage.split(';')[0]}</span></div>
+      <div class="compare-row"><span class="ckey">Synergy</span><span class="cval">${p.synergy?.join(', ')||'N/A'}</span></div>
+      <div style="margin-top:9px;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px;"><span style="color:var(--text3);">Efficacy</span><span style="font-weight:600;">${p.eff}/10</span></div>
+        <div class="score-bar"><div class="score-fill" style="width:${p.eff*10}%;"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin:6px 0 3px;"><span style="color:var(--text3);">Safety</span><span style="font-weight:600;">${p.safe}/10</span></div>
+        <div class="score-bar"><div class="score-fill" style="width:${p.safe*10}%;background:#5DCAA5;"></div></div>
+      </div>
+      <div style="margin-top:9px;font-size:11px;color:var(--text2);line-height:1.5;">${p.notes}</div>
+    </div>`;
+  });
+  html+='</div>';
+  for(let i=0;i<items.length;i++) for(let j=i+1;j<items.length;j++){
+    const k=[items[i],items[j]].sort().join('+');
+    if(CONFLICTS[k]) html+=`<div class="alert-box alert-red" style="margin-top:11px;"><strong>⚠ Conflict (${CONFLICTS[k].sev}) — ${items[i]} + ${items[j]}:</strong><br>${CONFLICTS[k].msg}</div>`;
+  }
+  SYNERGIES.filter(s=>s.pair.every(p=>items.includes(p))).forEach(s=>{
+    html+=`<div class="alert-box alert-teal" style="margin-top:9px;"><strong>✓ Synergy — ${s.pair.join(' + ')}:</strong> ${s.note}</div>`;
+  });
+  el.innerHTML=html;
+};
+
+// ══════════════════════════════════════
+// CALCULATOR
+// ══════════════════════════════════════
+window.calcDose = function() {
+  const vial=parseFloat(document.getElementById('vialMg').value);
+  const water=parseFloat(document.getElementById('bactWater').value);
+  const dose=parseFloat(document.getElementById('desiredMcg').value);
+  const syringe=document.getElementById('syringeType').value;
+  const sg=document.getElementById('summaryGrid');
+  if(!vial||!water){document.getElementById('calcNum').textContent='—';document.getElementById('calcLabel').textContent='Enter vial size and water added';document.getElementById('calcSub').textContent='';sg.style.display='none';return;}
+  const conc=(vial*1000)/water;
+  sg.style.display='grid';
+  document.getElementById('s1').textContent=conc.toFixed(0);
+  document.getElementById('s2').textContent=(conc/100).toFixed(1);
+  document.getElementById('s3').textContent=dose?Math.floor((vial*1000)/dose):'—';
+  if(!dose){document.getElementById('calcNum').textContent=conc.toFixed(0)+' mcg/ml';document.getElementById('calcLabel').textContent='Concentration after reconstitution';document.getElementById('calcSub').textContent=`${(vial*1000).toFixed(0)} mcg total in vial`;return;}
+  const ml=dose/conc;
+  if(syringe==='100'){document.getElementById('calcNum').textContent=(ml*100).toFixed(1)+' units';document.getElementById('calcLabel').textContent=`Draw to ${(ml*100).toFixed(1)} on your U-100 syringe`;}
+  else if(syringe==='50'){document.getElementById('calcNum').textContent=(ml*50).toFixed(1)+' units';document.getElementById('calcLabel').textContent=`Draw to ${(ml*50).toFixed(1)} on your U-50 syringe`;}
+  else{document.getElementById('calcNum').textContent=ml.toFixed(3)+' ml';document.getElementById('calcLabel').textContent=`Draw ${ml.toFixed(3)} ml`;}
+  document.getElementById('calcSub').textContent=`= ${dose} mcg from a ${conc.toFixed(0)} mcg/ml solution`;
+};
+
+document.querySelectorAll('#cyclePills .pill').forEach(p=>{p.onclick=()=>{document.querySelectorAll('#cyclePills .pill').forEach(x=>x.classList.remove('on'));p.classList.add('on');S.cycle=p.dataset.c;renderTimeline();};});
+document.querySelectorAll('#patternPills .pill').forEach(p=>{p.onclick=()=>{document.querySelectorAll('#patternPills .pill').forEach(x=>x.classList.remove('on'));p.classList.add('on');S.pattern=p.dataset.p;renderTimeline();};});
+
+function renderTimeline() {
+  const weeks=parseInt(S.cycle),pattern=S.pattern;
+  const el=document.getElementById('timeline');
+  let rows=`<div class="tl-legend"><div class="tl-legend-item"><div class="tl-dot" style="background:var(--tl);border:1px solid var(--tm);"></div>Active</div><div class="tl-legend-item"><div class="tl-dot" style="background:var(--g100);border:1px solid var(--border);"></div>Rest</div></div>`;
+  let active=0;
+  for(let w=1;w<=weeks;w++){
+    const d=(w-1)%7;
+    const on=pattern==='daily'?true:pattern==='5on2off'?d<5:pattern==='eod'?w%2===1:pattern==='2on5off'?d<2:[0,2,4].includes(d);
+    if(on)active++;
+    const pct=Math.round((w/weeks)*100);
+    rows+=`<div class="week-row"><div class="week-label">Wk ${w}</div><div class="week-bar ${on?'bar-on':'bar-off'}" style="width:${Math.max(pct,8)}%;">${on?'Active':'Rest'}</div>${w===1?'<span style="font-size:11px;color:var(--text3);">Start low</span>':w===weeks?'<span style="font-size:11px;color:var(--text3);">Final week</span>':''}</div>`;
+  }
+  rows+=`<div style="margin-top:10px;font-size:11px;color:var(--text3);">${active} active weeks of ${weeks} total (${Math.round(active/weeks*100)}% on-protocol)</div>`;
+  el.innerHTML=rows;
+}
+
+// ══════════════════════════════════════
+// JOURNAL
+// ══════════════════════════════════════
+window.addJournalEntry = function() {
+  const weekNum = S.journal.length+1;
+  const entry = { id:Date.now(), week:weekNum, date:new Date().toLocaleDateString(), energy:0, sleep:0, bodyComp:0, mood:0, note:'' };
+  S.journal.unshift(entry);
+  localStorage.setItem('pg_j',JSON.stringify(S.journal));
+  renderJournal();
+};
+
+function renderJournal() {
+  const el=document.getElementById('journalContent');
+  if(!S.journal.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📓</div>No journal entries yet.<br>Click "+ Log this week" to start tracking your cycle.</div>';return;}
+  el.innerHTML=S.journal.map((j,idx)=>`
+    <div class="journal-week">
+      <div class="journal-week-head">
+        <div class="journal-week-title">Week ${j.week} — ${j.date}</div>
+        <button class="btn btn-outline btn-sm" onclick="deleteJournal(${idx})">Delete</button>
+      </div>
+      <div class="journal-metrics">
+        ${['energy','sleep','bodyComp','mood'].map(m=>`
+          <div class="metric-item">
+            <div class="metric-label">${m==='bodyComp'?'Body comp':m.charAt(0).toUpperCase()+m.slice(1)}</div>
+            <div class="metric-stars">${[1,2,3,4,5].map(s=>`<span class="star ${j[m]>=s?'on':''}" onclick="rateJournal(${idx},'${m}',${s})">★</span>`).join('')}</div>
+          </div>`).join('')}
+      </div>
+      <textarea style="font-size:12px;min-height:52px;" placeholder="Notes for this week..." onchange="updateJournalNote(${idx},this.value)">${j.note}</textarea>
+    </div>`).join('');
+}
+
+window.rateJournal = function(idx,metric,val) { S.journal[idx][metric]=val; localStorage.setItem('pg_j',JSON.stringify(S.journal)); renderJournal(); };
+window.updateJournalNote = function(idx,val) { S.journal[idx].note=val; localStorage.setItem('pg_j',JSON.stringify(S.journal)); };
+window.deleteJournal = function(idx) { S.journal.splice(idx,1); localStorage.setItem('pg_j',JSON.stringify(S.journal)); renderJournal(); };
+
+// ══════════════════════════════════════
+// VIAL TRACKER
+// ══════════════════════════════════════
+window.showAddVial = function() { document.getElementById('addVialCard').style.display='block'; };
+
+window.addVial = function() {
+  const pep=document.getElementById('vialPep').value;
+  const size=parseFloat(document.getElementById('vialSize').value);
+  const dose=parseFloat(document.getElementById('vialDose').value);
+  const status=document.getElementById('vialStatus').value;
+  const date=document.getElementById('vialDate').value;
+  if(!pep||!size||!dose){toast('Fill in all required fields');return;}
+  const totalDoses=Math.floor((size*1000)/dose);
+  S.vials.unshift({id:Date.now(),pep,size,dose,status,date,totalDoses,usedDoses:0,reconDate:status==='reconstituted'?date:null});
+  localStorage.setItem('pg_v',JSON.stringify(S.vials));
+  document.getElementById('addVialCard').style.display='none';
+  renderVials();
+  toast('Vial added ✓');
+};
+
+function renderVials() {
+  const el=document.getElementById('vialContent');
+  if(!S.vials.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">💉</div>No vials tracked yet.<br>Click "+ Add vial" to start tracking.</div>';return;}
+  el.innerHTML=S.vials.map((v,idx)=>{
+    const remaining=v.totalDoses-v.usedDoses;
+    const pct=Math.round((remaining/v.totalDoses)*100);
+    let warning='';
+    if(v.status==='reconstituted'&&v.reconDate){
+      const days=Math.floor((Date.now()-new Date(v.reconDate))/(1000*60*60*24));
+      if(days>28) warning=`<div class="vial-warning vial-expired">⚠ Reconstituted ${days} days ago — likely expired (28 day limit)</div>`;
+      else if(days>20) warning=`<div class="vial-warning">⏰ Reconstituted ${days} days ago — expires in ~${28-days} days</div>`;
+    }
+    if(remaining<=2&&remaining>0) warning+='<div class="vial-warning">📦 Running low — consider reordering</div>';
+    return `<div class="vial-card">
+      <div class="vial-head">
+        <div><div class="vial-name">${v.pep}</div><div class="vial-meta">${v.size}mg vial · ${v.dose}mcg/dose · ${v.status}</div></div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-outline btn-sm" onclick="logDose(${idx})">Log dose</button>
+          <button class="btn btn-danger btn-sm" onclick="removeVial(${idx})">Remove</button>
+        </div>
+      </div>
+      <div class="vial-doses-row">
+        <div class="vial-doses-label">Doses remaining</div>
+        <div class="vial-doses-bar"><div class="vial-doses-fill" style="width:${pct}%;background:${pct>50?'var(--teal)':pct>20?'#F59E0B':'#EF4444'};"></div></div>
+        <div class="vial-doses-count">${remaining}/${v.totalDoses}</div>
+      </div>
+      ${warning}
+    </div>`;
+  }).join('');
+}
+
+window.logDose = function(idx) {
+  if(S.vials[idx].usedDoses>=S.vials[idx].totalDoses){toast('Vial is empty');return;}
+  S.vials[idx].usedDoses++;
+  localStorage.setItem('pg_v',JSON.stringify(S.vials));
+  renderVials(); toast('Dose logged ✓');
+};
+
+window.removeVial = function(idx) {
+  if(!confirm('Remove this vial?')) return;
+  S.vials.splice(idx,1); localStorage.setItem('pg_v',JSON.stringify(S.vials)); renderVials();
+};
+
+// ══════════════════════════════════════
+// INJECTION ROTATOR
+// ══════════════════════════════════════
+window.toggleSite = function(siteId,siteName) {
+  const entry={site:siteId,name:siteName,date:new Date().toLocaleDateString(),time:new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})};
+  S.injLog.unshift(entry);
+  if(S.injLog.length>50) S.injLog.pop();
+  localStorage.setItem('pg_i',JSON.stringify(S.injLog));
+  renderInjLog();
+  toast(`Logged: ${siteName} ✓`);
+};
+
+window.logInjection = function() { toast('Tap a site on the diagram to log an injection'); };
+
+function renderInjLog() {
+  const el=document.getElementById('siteLog');
+  if(!S.injLog.length){el.innerHTML='<div style="font-size:13px;color:var(--text3);">No injections logged yet.</div>';return;}
+  const siteCounts={};
+  S.injLog.forEach(l=>{siteCounts[l.name]=(siteCounts[l.name]||0)+1;});
+  el.innerHTML=S.injLog.slice(0,10).map(l=>`<div class="site-log-item"><span style="font-size:13px;font-weight:500;">${l.name}</span><span style="color:var(--text3);">${l.date} ${l.time}</span></div>`).join('');
+  const overused=Object.entries(siteCounts).filter(([,c])=>c>=3);
+  if(overused.length) el.innerHTML=`<div class="alert-box alert-amber">⚠ Consider resting: ${overused.map(([n])=>n).join(', ')}</div>`+el.innerHTML;
+}
+
+// ══════════════════════════════════════
+// COMMUNITY
+// ══════════════════════════════════════
+function renderCommunity(filter) {
+  const el=document.getElementById('communityFeed');
+  let stacks=COMMUNITY_STACKS;
+  if(filter==='fat') stacks=stacks.filter(s=>s.goals.toLowerCase().includes('fat'));
+  else if(filter==='muscle') stacks=stacks.filter(s=>s.goals.toLowerCase().includes('muscle'));
+  else if(filter==='cognitive') stacks=stacks.filter(s=>s.goals.toLowerCase().includes('cognitive'));
+  el.innerHTML=stacks.map(s=>`
+    <div class="community-stack">
+      <div class="cs-head">
+        <div><div class="cs-goals">${s.goals}</div><div class="cs-meta">${s.exp} · ${s.weeks?s.weeks+' week cycle':'Ongoing'}</div></div>
+        <div class="cs-rating">${'★'.repeat(s.rating)+'☆'.repeat(5-s.rating)}</div>
+      </div>
+      <div class="cs-peptides">${s.peptides.map(p=>`<span class="cs-pep">${p}</span>`).join('')}</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:8px;">"${s.note}"</div>
+      <div class="cs-stats"><span>${s.reviews} reviews</span><span>★ ${s.rating}.0 avg</span></div>
+    </div>`).join('');
+}
+
+window.filterCommunity = function(f) {
+  document.querySelectorAll('#panel-community .pill').forEach(p=>p.classList.remove('on'));
+  event.target.classList.add('on');
+  renderCommunity(f);
+};
+
+// ══════════════════════════════════════
+// PDF EXPORT
+// ══════════════════════════════════════
+window.exportPDF = function() {
+  if(!S.lastResult){toast('Generate a stack first');return;}
+  try {
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const m=16,w=210,cw=w-m*2;
+    doc.setFillColor(29,158,117); doc.rect(0,0,210,22,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(18); doc.setFont('helvetica','bold'); doc.text('PIN',m,14);
+    doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.text('Research Peptide Stack Report',m+44,14);
+    doc.setTextColor(50,50,50); doc.setFontSize(10);
+    doc.setFont('helvetica','bold'); doc.text('Goals:',m,32); doc.setFont('helvetica','normal');
+    doc.text(doc.splitTextToSize(S.lastGoals,cw-20),m+18,32);
+    doc.setFont('helvetica','bold'); doc.text('Experience:',m,38); doc.setFont('helvetica','normal'); doc.text(S.exp,m+28,38);
+    doc.setFont('helvetica','bold'); doc.text('Generated:',m,44); doc.setFont('helvetica','normal'); doc.text(new Date().toLocaleDateString(),m+26,44);
+    doc.setDrawColor(200,220,210); doc.line(m,48,w-m,48);
+    doc.setTextColor(30,30,30); doc.setFontSize(10); doc.setFont('helvetica','normal');
+    const lines=doc.splitTextToSize(S.lastResult,cw);
+    let y=56;
+    lines.forEach(line=>{
+      if(y>272){doc.addPage();y=16;}
+      const bold=line.includes('═══')||line.startsWith('▸');
+      doc.setFont('helvetica',bold?'bold':'normal');
+      doc.setTextColor(bold?29:30,bold?158:30,bold?117:30);
+      doc.text(line,m,y); y+=5.8;
+    });
+    const pages=doc.internal.getNumberOfPages();
+    for(let i=1;i<=pages;i++){doc.setPage(i);doc.setFontSize(8);doc.setTextColor(160);doc.text('DISCLAIMER: Educational and research purposes only. Not medical advice. Consult a physician.',m,287);doc.text(`${i}/${pages}`,w-m,287,{align:'right'});}
+    doc.save(`pepguide-${Date.now()}.pdf`);
+    toast('PDF downloaded ✓');
+  } catch(e){toast('PDF error — try again');}
+};
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+function toast(msg) {
+  const el=document.createElement('div'); el.className='toast'; el.textContent=msg;
+  document.body.appendChild(el); setTimeout(()=>el.remove(),2600);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+renderTimeline();
+renderDB();
+renderCommunity();
+renderInjLog();
+</script>
+</body>
+</html>
