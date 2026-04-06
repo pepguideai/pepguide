@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PIN Vendor Directory — Trusted Research Peptide Suppliers</title>
+  <meta name="description" content="The most trusted directory of research peptide vendors. Community-rated, independently reviewed. Find reputable suppliers for your research protocol."/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal:#1D9E75; --tl:#E1F5EE; --tm:#5DCAA5; --td:#0F6E56; --tdp:#085041;
+      --g50:#F9FAFB; --g100:#F3F4F6; --g200:#E5E7EB; --g300:#D1D5DB;
+      --g400:#9CA3AF; --g500:#6B7280; --g600:#4B5563; --g800:#1F2937; --g900:#111827;
+      --text:#111827; --text2:#4B5563; --text3:#9CA3AF;
+      --border:#E5E7EB; --border2:#D1D5DB; --r:10px; --rl:14px;
+    }
+    html { font-size:15px; }
+    body { font-family:'Inter',sans-serif; color:var(--text); background:var(--g50); }
+    nav { background:#fff; border-bottom:1px solid var(--border); padding:0 5%; position:sticky; top:0; z-index:50; }
+    .nav-inner { max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; height:60px; }
+    .logo { font-size:20px; font-weight:800; letter-spacing:-0.5px; text-decoration:none; color:var(--text); }
+    .logo span { color:var(--teal); }
+    .nav-links { display:flex; gap:20px; align-items:center; }
+    .nav-links a { font-size:13px; font-weight:500; color:var(--text2); text-decoration:none; }
+    .nav-links a:hover { color:var(--teal); }
+    .nav-btn { background:var(--teal); color:#fff !important; padding:8px 18px; border-radius:var(--r); font-size:13px; font-weight:600; text-decoration:none; }
+
+    .hero { background:#fff; border-bottom:1px solid var(--border); padding:52px 5%; }
+    .hero-inner { max-width:1100px; margin:0 auto; }
+    .eyebrow { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.8px; color:var(--teal); margin-bottom:10px; }
+    .hero h1 { font-size:38px; font-weight:800; letter-spacing:-1px; margin-bottom:12px; }
+    .hero p { font-size:16px; color:var(--text2); max-width:580px; line-height:1.7; margin-bottom:24px; }
+    .hero-disclaimer { background:#FFF7ED; border:1px solid #FED7AA; border-radius:var(--r); padding:12px 16px; font-size:13px; color:#92400E; max-width:680px; }
+
+    .main { max-width:1100px; margin:0 auto; padding:32px 5%; display:grid; grid-template-columns:1fr 280px; gap:24px; }
+
+    /* FILTERS */
+    .sidebar { }
+    .filter-card { background:#fff; border:1px solid var(--border); border-radius:var(--rl); padding:18px; margin-bottom:14px; }
+    .filter-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text3); margin-bottom:12px; }
+    .filter-opt { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text2); padding:6px 0; cursor:pointer; border-radius:6px; }
+    .filter-opt input { accent-color:var(--teal); width:15px; height:15px; }
+    .filter-opt.active { color:var(--teal); font-weight:500; }
+    .advertise-box { background:var(--g900); border-radius:var(--rl); padding:20px; color:#fff; }
+    .ad-box-title { font-size:14px; font-weight:700; margin-bottom:6px; }
+    .ad-box-sub { font-size:12px; color:rgba(255,255,255,0.5); line-height:1.6; margin-bottom:14px; }
+    .ad-box-btn { display:block; text-align:center; background:var(--teal); color:#fff; padding:10px; border-radius:var(--r); font-size:13px; font-weight:600; text-decoration:none; transition:background 0.15s; }
+    .ad-box-btn:hover { background:var(--td); }
+    .ad-slots { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+    .ad-slot { background:rgba(255,255,255,0.06); border-radius:var(--r); padding:10px 12px; display:flex; justify-content:space-between; }
+    .ad-slot-name { font-size:12px; font-weight:600; }
+    .ad-slot-price { font-size:12px; color:var(--tm); font-weight:700; }
+
+    /* VENDOR CARDS */
+    .vendors { }
+    .vendors-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .vendors-count { font-size:13px; color:var(--text2); }
+    .sort-select { font-size:12px; padding:6px 10px; border:1px solid var(--border2); border-radius:var(--r); background:#fff; color:var(--text); outline:none; }
+    .vendor-card { background:#fff; border:1px solid var(--border); border-radius:var(--rl); padding:22px; margin-bottom:12px; display:grid; grid-template-columns:60px 1fr auto; gap:16px; align-items:start; transition:border-color 0.15s; }
+    .vendor-card:hover { border-color:var(--tm); }
+    .vendor-card.featured { border:2px solid var(--teal); }
+    .vendor-logo { width:60px; height:60px; border-radius:var(--r); background:var(--g100); display:flex; align-items:center; justify-content:center; font-size:22px; border:1px solid var(--border); flex-shrink:0; }
+    .vendor-body { }
+    .vendor-top { display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap; }
+    .vendor-name { font-size:15px; font-weight:700; color:var(--text); }
+    .vendor-badge { font-size:10px; padding:2px 8px; border-radius:100px; font-weight:700; }
+    .badge-featured { background:var(--tl); color:var(--tdp); }
+    .badge-verified { background:#EFF6FF; color:#1D4ED8; }
+    .badge-new { background:#FFF7ED; color:#C2410C; }
+    .vendor-desc { font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:10px; }
+    .vendor-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+    .vendor-tag { font-size:11px; padding:3px 9px; border-radius:100px; background:var(--g100); color:var(--text2); font-weight:500; }
+    .vendor-meta { display:flex; gap:16px; font-size:12px; color:var(--text3); }
+    .vendor-meta-item { display:flex; align-items:center; gap:4px; }
+    .vendor-actions { display:flex; flex-direction:column; gap:8px; align-items:flex-end; flex-shrink:0; }
+    .vendor-rating { text-align:center; }
+    .rating-num { font-size:22px; font-weight:800; color:var(--text); }
+    .rating-stars { color:#F59E0B; font-size:13px; }
+    .rating-count { font-size:11px; color:var(--text3); }
+    .btn-visit { background:var(--teal); color:#fff; padding:9px 18px; border-radius:var(--r); font-size:13px; font-weight:600; text-decoration:none; white-space:nowrap; transition:background 0.15s; }
+    .btn-visit:hover { background:var(--td); }
+    .btn-outline { border:1px solid var(--border2); color:var(--text2); padding:8px 14px; border-radius:var(--r); font-size:12px; font-weight:500; text-decoration:none; white-space:nowrap; transition:all 0.15s; }
+    .btn-outline:hover { border-color:var(--teal); color:var(--teal); }
+
+    /* AD BANNER */
+    .ad-banner { background:#fff; border:1px solid var(--border); border-radius:var(--rl); padding:16px 20px; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .ad-label { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; flex-shrink:0; }
+    .ad-content { flex:1; text-align:center; min-height:52px; border:1.5px dashed var(--border2); border-radius:var(--r); display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--text3); }
+
+    .disclaimer { font-size:11px; color:var(--text3); line-height:1.6; padding:20px; border-top:1px solid var(--border); max-width:1100px; margin:0 auto; }
+    @media(max-width:768px) { .main { grid-template-columns:1fr; } .nav-links { display:none; } .vendor-card { grid-template-columns:1fr; } .vendor-actions { flex-direction:row; align-items:center; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">P<span>I</span>N</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="app.html">App</a>
+      <a href="research.html">Research hub</a>
+      <a href="creators.html">Creator hub</a>
+      <a href="app.html" class="nav-btn">Enter PIN →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">PIN Vendor Directory</div>
+    <h1>Trusted research peptide suppliers</h1>
+    <p>The most comprehensive, community-rated directory of research peptide vendors. Every listing is independently reviewed. We don't sell peptides and receive no commission — our only interest is helping you find reputable sources.</p>
+    <div class="hero-disclaimer">⚠️ PIN does not endorse, recommend, or receive compensation from any listed vendor. All peptides are research chemicals not approved for human use. This directory is for informational purposes only. Always verify vendor legitimacy independently and consult a healthcare provider.</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" style="order:2;">
+
+    <div class="filter-card">
+      <div class="filter-title">Filter by category</div>
+      <label class="filter-opt"><input type="checkbox" checked onchange="filterVendors()"/> All vendors</label>
+      <label class="filter-opt"><input type="checkbox" onchange="filterVendors()"/> Healing peptides</label>
+      <label class="filter-opt"><input type="checkbox" onchange="filterVendors()"/> GH axis</label>
+      <label class="filter-opt"><input type="checkbox" onchange="filterVendors()"/> Metabolic / GLP-1</label>
+      <label class="filter-opt"><input type="checkbox" onchange="filterVendors()"/> Cognitive</label>
+      <label class="filter-opt"><input type="checkbox" onchange="filterVendors()"/> Longevity</label>
+    </div>
+
+    <div class="filter-card">
+      <div class="filter-title">Filter by region</div>
+      <label class="filter-opt"><input type="checkbox" checked/> All regions</label>
+      <label class="filter-opt"><input type="checkbox"/> United States</label>
+      <label class="filter-opt"><input type="checkbox"/> Europe</label>
+      <label class="filter-opt"><input type="checkbox"/> International shipping</label>
+    </div>
+
+    <div class="advertise-box">
+      <div class="ad-box-title">Advertise on PIN</div>
+      <div class="ad-box-sub">Reach thousands of active peptide researchers. Featured listings, banner ads, and newsletter sponsorships available.</div>
+      <div class="ad-slots">
+        <div class="ad-slot"><span class="ad-slot-name">Featured listing</span><span class="ad-slot-price">$299/mo</span></div>
+        <div class="ad-slot"><span class="ad-slot-name">Banner placement</span><span class="ad-slot-price">$199/mo</span></div>
+        <div class="ad-slot"><span class="ad-slot-name">Newsletter spot</span><span class="ad-slot-price">$499/issue</span></div>
+      </div>
+      <a href="mailto:ads@peptideintelligencenetwork.com" class="ad-box-btn">Get in touch →</a>
+    </div>
+  </div>
+
+  <!-- VENDORS -->
+  <div class="vendors" style="order:1;">
+
+    <div class="vendors-header">
+      <div class="vendors-count" id="vendorCount">Showing all vendors</div>
+      <select class="sort-select">
+        <option>Sort by: Community rating</option>
+        <option>Sort by: Newest</option>
+        <option>Sort by: Name A-Z</option>
+      </select>
+    </div>
+
+    <!-- AD BANNER SLOT -->
+    <div class="ad-banner">
+      <span class="ad-label">Sponsored</span>
+      <div class="ad-content">Banner ad slot — 728×60 · <a href="mailto:ads@peptideintelligencenetwork.com" style="color:var(--teal);text-decoration:none;">Advertise here</a></div>
+    </div>
+
+    <!-- FEATURED VENDORS (placeholders — to be replaced with real partners) -->
+    <div class="vendor-card featured">
+      <div class="vendor-logo">🧬</div>
+      <div class="vendor-body">
+        <div class="vendor-top">
+          <span class="vendor-name">Vendor Name</span>
+          <span class="vendor-badge badge-featured">Featured</span>
+          <span class="vendor-badge badge-verified">Verified</span>
+        </div>
+        <div class="vendor-desc">This is a placeholder for a featured vendor partner. Real vendor descriptions will include specialties, shipping regions, third-party testing information, and community-submitted reviews.</div>
+        <div class="vendor-tags">
+          <span class="vendor-tag">BPC-157</span>
+          <span class="vendor-tag">TB-500</span>
+          <span class="vendor-tag">GH Peptides</span>
+          <span class="vendor-tag">US-based</span>
+          <span class="vendor-tag">Third-party tested</span>
+        </div>
+        <div class="vendor-meta">
+          <span class="vendor-meta-item">🧪 Third-party COA</span>
+          <span class="vendor-meta-item">🚚 Ships to US/Canada</span>
+          <span class="vendor-meta-item">💳 Crypto accepted</span>
+        </div>
+      </div>
+      <div class="vendor-actions">
+        <div class="vendor-rating">
+          <div class="rating-num">4.8</div>
+          <div class="rating-stars">★★★★★</div>
+          <div class="rating-count">142 reviews</div>
+        </div>
+        <a href="#" class="btn-visit">Visit site →</a>
+        <a href="#" class="btn-outline">Read reviews</a>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-logo">🔬</div>
+      <div class="vendor-body">
+        <div class="vendor-top">
+          <span class="vendor-name">Vendor Name</span>
+          <span class="vendor-badge badge-verified">Verified</span>
+        </div>
+        <div class="vendor-desc">Placeholder for a verified vendor. Real listings will include detailed product availability, pricing ranges, turnaround times, and community reputation data aggregated from multiple forums.</div>
+        <div class="vendor-tags">
+          <span class="vendor-tag">GLP-1 peptides</span>
+          <span class="vendor-tag">Metabolic</span>
+          <span class="vendor-tag">International</span>
+        </div>
+        <div class="vendor-meta">
+          <span class="vendor-meta-item">🧪 HPLC tested</span>
+          <span class="vendor-meta-item">🚚 Ships worldwide</span>
+        </div>
+      </div>
+      <div class="vendor-actions">
+        <div class="vendor-rating">
+          <div class="rating-num">4.5</div>
+          <div class="rating-stars">★★★★½</div>
+          <div class="rating-count">87 reviews</div>
+        </div>
+        <a href="#" class="btn-visit">Visit site →</a>
+        <a href="#" class="btn-outline">Read reviews</a>
+      </div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vendor-logo">⚗️</div>
+      <div class="vendor-body">
+        <div class="vendor-top">
+          <span class="vendor-name">Vendor Name</span>
+          <span class="vendor-badge badge-new">New listing</span>
+        </div>
+        <div class="vendor-desc">Placeholder for a newly listed vendor. New listings require 30 days of community reviews before receiving a verified badge. Listings are community-submitted and independently reviewed by PIN.</div>
+        <div class="vendor-tags">
+          <span class="vendor-tag">Cognitive peptides</span>
+          <span class="vendor-tag">Longevity</span>
+          <span class="vendor-tag">Europe</span>
+        </div>
+        <div class="vendor-meta">
+          <span class="vendor-meta-item">🧪 COA available</span>
+          <span class="vendor-meta-item">🚚 Ships to EU</span>
+        </div>
+      </div>
+      <div class="vendor-actions">
+        <div class="vendor-rating">
+          <div class="rating-num">4.2</div>
+          <div class="rating-stars">★★★★☆</div>
+          <div class="rating-count">23 reviews</div>
+        </div>
+        <a href="#" class="btn-visit">Visit site →</a>
+        <a href="#" class="btn-outline">Read reviews</a>
+      </div>
+    </div>
+
+    <!-- SUBMIT VENDOR CTA -->
+    <div style="background:var(--tl);border:1px solid var(--tm);border-radius:var(--rl);padding:22px;text-align:center;margin-top:8px;">
+      <div style="font-size:15px;font-weight:700;color:var(--tdp);margin-bottom:6px;">Know a reputable vendor?</div>
+      <div style="font-size:13px;color:var(--td);margin-bottom:14px;line-height:1.6;">Submit a vendor for review. We verify legitimacy, check for third-party testing documentation, and publish community reviews before listing.</div>
+      <a href="mailto:vendors@peptideintelligencenetwork.com" style="background:var(--teal);color:#fff;padding:10px 22px;border-radius:var(--r);font-size:13px;font-weight:600;text-decoration:none;">Submit a vendor →</a>
+    </div>
+
+  </div>
+</div>
+
+<div class="disclaimer">
+  PIN Vendor Directory is for informational purposes only. PIN does not endorse any vendor, receive commissions on sales, or verify product quality. All peptides are research chemicals not approved by the FDA for human use. Always conduct your own due diligence, request certificates of analysis, and consult a healthcare provider before purchasing or using any research compound. PIN bears no responsibility for the quality, safety, or legality of products sold by listed vendors.
+</div>
+
+</body>
+</html>

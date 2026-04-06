@@ -4,6 +4,8 @@
     { "source": "/api/pubmed", "destination": "/api/pubmed" },
     { "source": "/app", "destination": "/app.html" },
     { "source": "/research", "destination": "/research.html" },
+    { "source": "/vendors", "destination": "/vendors.html" },
+    { "source": "/creators", "destination": "/creators.html" },
     { "source": "/", "destination": "/index.html" }
   ]
 }
