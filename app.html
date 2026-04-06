@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PepGuide — Research Peptide Platform</title>
+  <title>PIN — Research Peptide Platform</title>
   <meta name="description" content="The complete research peptide platform. Stack generator, database, dosing calculator, cycle journal, vial tracker, and community."/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -282,14 +282,14 @@
 <!-- SIDEBAR -->
 <nav class="sidebar" id="sidebar">
   <div class="sb-logo">
-    <div class="logo-mark">Pep<span>Guide</span></div>
-    <div class="logo-tag">Research peptide platform</div>
+    <div class="logo-mark">P<span>I</span>N</div>
+    <div class="logo-tag">Peptide Intelligence Network</div>
   </div>
   <div class="sb-section">Generate</div>
   <div class="sb-nav">
     <div class="nav-item active" onclick="show('wizard')"><span class="nav-icon">🚀</span>Start here <span class="nav-badge">New</span></div>
     <div class="nav-item" onclick="show('generator')"><span class="nav-icon">⚗️</span>Stack generator</div>
-    <div class="nav-item" onclick="show('chat')"><span class="nav-icon">💬</span>Ask PepGuide AI</div>
+    <div class="nav-item" onclick="show('chat')"><span class="nav-icon">💬</span>Ask PIN AI</div>
   </div>
   <div class="sb-section">Research</div>
   <div class="sb-nav">
@@ -398,12 +398,12 @@
     <!-- ══ CHAT ══ -->
     <div class="panel" id="panel-chat">
       <div class="card">
-        <div class="card-head"><div class="card-title">Ask PepGuide AI anything</div><span class="badge badge-teal">Powered by Claude</span></div>
+        <div class="card-head"><div class="card-title">Ask PIN AI anything</div><span class="badge badge-teal">Powered by Claude</span></div>
         <div class="chat-wrap">
           <div class="chat-messages" id="chatMessages">
             <div class="chat-msg ai">
-              <div class="chat-sender">PepGuide AI</div>
-              <div class="chat-bubble">Hi! I'm PepGuide AI. Ask me anything about peptides — dosing questions, what a peptide does, how to reconstitute, stack advice, side effects, or anything else. I'm here to help beginners and experts alike. What's on your mind?</div>
+              <div class="chat-sender">PIN AI</div>
+              <div class="chat-bubble">Hi! I'm PIN AI. Ask me anything about peptides — dosing questions, what a peptide does, how to reconstitute, stack advice, side effects, or anything else. I'm here to help beginners and experts alike. What's on your mind?</div>
             </div>
           </div>
           <div class="chat-input-row">
@@ -717,7 +717,7 @@ const S = {
 const PAGE_META = {
   wizard:    { title:'Start here', sub:'Build your first research peptide stack in 2 minutes' },
   generator: { title:'Stack generator', sub:'Select goals and generate a personalized research protocol' },
-  chat:      { title:'Ask PepGuide AI', sub:'Get instant answers to any peptide question' },
+  chat:      { title:'Ask PIN AI', sub:'Get instant answers to any peptide question' },
   database:  { title:'Peptide database', sub:`${Object.keys(PEPTIDES).length} research peptides with full protocol data` },
   compare:   { title:'Compare peptides', sub:'Side-by-side comparison with conflict and synergy detection' },
   calculator:{ title:'Dosing calculator', sub:'Reconstitution math + syringe measurement + protocol timeline' },
@@ -866,7 +866,7 @@ async function runWizardGenerate() {
   const inject = S.wizAnswers.inject||'any';
   const budget = S.wizAnswers.budget||'mid';
 
-  const prompt = `You are PepGuide, a friendly expert peptide advisor. The user is a ${exp} who has just completed our onboarding wizard.
+  const prompt = `You are PIN, a friendly expert peptide advisor. The user is a ${exp} who has just completed our onboarding wizard.
 
 Profile:
 - Goals: ${goals}
@@ -946,7 +946,7 @@ window.generate = async function() {
   const extra=document.getElementById('extra').value.trim();
   const pepList=Object.entries(PEPTIDES).map(([n,p])=>`${n} (${p.cat}): ${p.bestFor.join(', ')}`).join('\n');
 
-  const prompt=`You are PepGuide, an expert research peptide advisor (educational only).
+  const prompt=`You are PIN, an expert research peptide advisor (educational only).
 
 AVAILABLE PEPTIDES:
 ${pepList}
@@ -1065,10 +1065,10 @@ window.sendChat = async function() {
   const msgs=document.getElementById('chatMessages');
   msgs.innerHTML+=`<div class="chat-msg user"><div class="chat-sender">You</div><div class="chat-bubble">${msg}</div></div>`;
   S.chatHistory.push({role:'user',content:msg});
-  msgs.innerHTML+=`<div class="chat-msg ai" id="chatThinking"><div class="chat-sender">PepGuide AI</div><div class="chat-bubble" style="color:var(--text3);font-style:italic;">Thinking...</div></div>`;
+  msgs.innerHTML+=`<div class="chat-msg ai" id="chatThinking"><div class="chat-sender">PIN AI</div><div class="chat-bubble" style="color:var(--text3);font-style:italic;">Thinking...</div></div>`;
   msgs.scrollTop=msgs.scrollHeight;
 
-  const systemPrompt=`You are PepGuide AI, a friendly and knowledgeable research peptide advisor. You specialize in explaining peptides clearly to beginners while also being able to go deep for advanced users. Always:
+  const systemPrompt=`You are PIN AI, a friendly and knowledgeable research peptide advisor. You specialize in explaining peptides clearly to beginners while also being able to go deep for advanced users. Always:
 - Use plain English and explain any technical terms
 - Be warm and non-intimidating, especially with beginners
 - Give practical, actionable answers
@@ -1081,9 +1081,9 @@ Keep responses concise but thorough.`;
     const data=await res.json();
     const reply=data.content?.map(b=>b.text||'').join('')||'Sorry, I had trouble responding.';
     S.chatHistory.push({role:'assistant',content:reply});
-    document.getElementById('chatThinking').innerHTML=`<div class="chat-sender">PepGuide AI</div><div class="chat-bubble">${reply.replace(/\n/g,'<br>')}</div>`;
+    document.getElementById('chatThinking').innerHTML=`<div class="chat-sender">PIN AI</div><div class="chat-bubble">${reply.replace(/\n/g,'<br>')}</div>`;
   } catch(e) {
-    document.getElementById('chatThinking').innerHTML=`<div class="chat-sender">PepGuide AI</div><div class="chat-bubble" style="color:var(--red);">Connection error. Please try again.</div>`;
+    document.getElementById('chatThinking').innerHTML=`<div class="chat-sender">PIN AI</div><div class="chat-bubble" style="color:var(--red);">Connection error. Please try again.</div>`;
   }
   msgs.scrollTop=msgs.scrollHeight;
 };
@@ -1410,7 +1410,7 @@ window.exportPDF = function() {
     const doc=new jsPDF({unit:'mm',format:'a4'});
     const m=16,w=210,cw=w-m*2;
     doc.setFillColor(29,158,117); doc.rect(0,0,210,22,'F');
-    doc.setTextColor(255,255,255); doc.setFontSize(18); doc.setFont('helvetica','bold'); doc.text('PepGuide',m,14);
+    doc.setTextColor(255,255,255); doc.setFontSize(18); doc.setFont('helvetica','bold'); doc.text('PIN',m,14);
     doc.setFontSize(10); doc.setFont('helvetica','normal'); doc.text('Research Peptide Stack Report',m+44,14);
     doc.setTextColor(50,50,50); doc.setFontSize(10);
     doc.setFont('helvetica','bold'); doc.text('Goals:',m,32); doc.setFont('helvetica','normal');
