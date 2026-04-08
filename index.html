@@ -78,6 +78,7 @@ body{font-family:'Inter',-apple-system,sans-serif;color:var(--text);font-size:15
 /* SCREENS */
 .screens{flex:1;overflow:hidden;position:relative}
 .screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;flex-direction:column;padding-bottom:calc(68px + var(--safeB))}
+#main-app{display:none;flex-direction:column;flex:1;overflow:hidden}
 .screen.on{display:flex}
 
 /* TAB BAR */
@@ -326,84 +327,41 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <div class="ob-progress"><div class="ob-bar" id="ob-prog" style="width:12%"></div></div>
   <div class="ob-screens">
 
-    <!-- Step 0: Home screen — shown every launch -->
+    <!-- Step 0: Home screen — always shown on launch -->
     <div class="ob-screen active" id="ob-0">
       <div class="ob-logo">
         <div class="ob-logo-mark">PIN</div>
         <div class="ob-logo-sub">Peptide Intelligence Network</div>
       </div>
-
-      <!-- RETURNING USER: shown when they have a stack -->
-      <div id="home-returning" style="display:none;flex:1;flex-direction:column;justify-content:center;padding-bottom:8px;">
-        <div style="background:linear-gradient(135deg,var(--bg3),var(--bg2));border-radius:var(--rxl);padding:20px;margin-bottom:14px;border:0.5px solid rgba(0,214,143,0.2);">
-          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--teal);margin-bottom:8px;">Welcome back</div>
-          <div style="font-size:20px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px;" id="home-username">Researcher</div>
-          <div style="font-size:13px;color:var(--text2);" id="home-goal-label">Your protocol is ready</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;">
-            <div style="background:rgba(255,255,255,0.04);border-radius:var(--r);padding:10px;text-align:center;">
-              <div style="font-size:20px;font-weight:800;color:var(--teal);" id="home-stat-doses">0</div>
-              <div style="font-size:10px;color:var(--text3);margin-top:2px;">Doses</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.04);border-radius:var(--r);padding:10px;text-align:center;">
-              <div style="font-size:20px;font-weight:800;color:var(--teal);" id="home-stat-streak">0</div>
-              <div style="font-size:10px;color:var(--text3);margin-top:2px;">Streak 🔥</div>
-            </div>
-            <div style="background:rgba(255,255,255,0.04);border-radius:var(--r);padding:10px;text-align:center;">
-              <div style="font-size:20px;font-weight:800;color:var(--teal);" id="home-stat-stacks">0</div>
-              <div style="font-size:10px;color:var(--text3);margin-top:2px;">Stacks</div>
-            </div>
-          </div>
-        </div>
-        <div id="home-today-doses" style="margin-bottom:14px;"></div>
-        <div style="background:var(--bg3);border-radius:var(--rl);padding:14px 16px;border:0.5px solid var(--border);margin-bottom:14px;">
-          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:10px;">Quick access</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <div onclick="enterApp('track')" style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:13px;cursor:pointer;text-align:center;">
-              <div style="font-size:22px;margin-bottom:4px;">💊</div>
-              <div style="font-size:12px;font-weight:600;">Track</div>
-            </div>
-            <div onclick="enterApp('stack')" style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:13px;cursor:pointer;text-align:center;">
-              <div style="font-size:22px;margin-bottom:4px;">⚗️</div>
-              <div style="font-size:12px;font-weight:600;">Stack</div>
-            </div>
-            <div onclick="enterApp('research')" style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:13px;cursor:pointer;text-align:center;">
-              <div style="font-size:22px;margin-bottom:4px;">🔬</div>
-              <div style="font-size:12px;font-weight:600;">Research</div>
-            </div>
-            <div onclick="enterApp('vendors')" style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:13px;cursor:pointer;text-align:center;">
-              <div style="font-size:22px;margin-bottom:4px;">🏪</div>
-              <div style="font-size:12px;font-weight:600;">Vendors</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- NEW USER: shown on first visit -->
-      <div id="home-new" style="flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:8px;">
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:8px;">
         <div class="ob-hero">The smartest peptide companion <span>ever built.</span></div>
         <div class="ob-desc">Track your protocol, build AI-powered stacks, explore the research, and connect with the peptide community — all in one place.</div>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px;">
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">
           <div style="display:flex;align-items:center;gap:14px;background:var(--bg3);border-radius:var(--rl);padding:14px 16px;border:0.5px solid var(--border2);">
-            <span style="font-size:26px;flex-shrink:0;">💊</span>
+            <span style="font-size:24px;flex-shrink:0;">💊</span>
             <div>
-              <div style="font-size:15px;font-weight:700;letter-spacing:-0.2px;color:var(--text);margin-bottom:3px;">Daily Dose Tracking</div>
-              <div style="font-size:13px;color:var(--text2);line-height:1.55;font-weight:400;">Log every injection, build streaks, and never lose track of where you are in your protocol.</div>
+              <div style="font-size:15px;font-weight:700;letter-spacing:-0.2px;color:var(--text);margin-bottom:2px;">Daily Dose Tracking</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.5;">Log every injection, build streaks, and never lose track of where you are in your protocol.</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:14px;background:var(--bg3);border-radius:var(--rl);padding:14px 16px;border:0.5px solid var(--border2);">
-            <span style="font-size:26px;flex-shrink:0;">🤖</span>
+            <span style="font-size:24px;flex-shrink:0;">🤖</span>
             <div>
-              <div style="font-size:15px;font-weight:700;letter-spacing:-0.2px;color:var(--text);margin-bottom:3px;">AI Stack Builder</div>
-              <div style="font-size:13px;color:var(--text2);line-height:1.55;font-weight:400;">Describe your goals and get a fully personalized, research-backed peptide protocol in seconds.</div>
+              <div style="font-size:15px;font-weight:700;letter-spacing:-0.2px;color:var(--text);margin-bottom:2px;">AI Stack Builder</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.5;">Describe your goals and get a fully personalized, research-backed peptide protocol in seconds.</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:14px;background:var(--bg3);border-radius:var(--rl);padding:14px 16px;border:0.5px solid var(--border2);">
-            <span style="font-size:26px;flex-shrink:0;">🔬</span>
+            <span style="font-size:24px;flex-shrink:0;">🔬</span>
             <div>
-              <div style="font-size:15px;font-weight:700;letter-spacing:-0.2px;color:var(--text);margin-bottom:3px;">Live Research Database</div>
-              <div style="font-size:13px;color:var(--text2);line-height:1.55;font-weight:400;">40+ peptides documented with mechanisms, dosing, safety profiles, and real PubMed studies.</div>
+              <div style="font-size:15px;font-weight:700;letter-spacing:-0.2px;color:var(--text);margin-bottom:2px;">Live Research Database</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.5;">40+ peptides with mechanisms, dosing, safety profiles, and real PubMed studies.</div>
             </div>
           </div>
+        </div>
+        <!-- Returning user: skip button — only visible after first stack built -->
+        <div id="home-skip-row" style="display:none;margin-bottom:4px;">
+          <button onclick="enterApp('track')" style="width:100%;background:transparent;border:1px solid rgba(0,214,143,0.3);border-radius:var(--r);padding:12px;font-family:inherit;font-size:14px;font-weight:600;color:var(--teal);cursor:pointer;">Welcome back — Enter PIN →</button>
         </div>
       </div>
     </div>
@@ -555,6 +513,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 </div>
 
 <!-- ══════════════ MAIN APP ══════════════ -->
+<div id="main-app">
 <div class="sb"></div>
 <div class="screens">
 
@@ -712,6 +671,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <div class="tab" id="tab-vendors" onclick="goTab('vendors')"><div class="tab-ic">🏪</div><div class="tab-lb">Vendors</div><div class="tab-dot"></div></div>
   <div class="tab" id="tab-profile" onclick="goTab('profile')"><div class="tab-ic">👤</div><div class="tab-lb">Profile</div><div class="tab-dot"></div></div>
 </div>
+</div><!-- /main-app -->
 
 <!-- ══ SHEETS ══ -->
 
@@ -1044,6 +1004,10 @@ function obNext() {
     try { renderStacks(); } catch(e) {}
     try { renderVendors(); } catch(e) {}
     try { renderProfile(); } catch(e) {}
+    // Pre-show main app so it's ready
+    var mainApp = document.getElementById('main-app');
+    if (mainApp) { mainApp.style.display = 'flex'; mainApp.style.flexDirection = 'column'; mainApp.style.flex = '1'; mainApp.style.overflow = 'hidden'; }
+    goTab('track');
     showHomeReturning();
     return;
   }
@@ -1140,10 +1104,24 @@ function buildObStack() {
 // NAVIGATION
 // ══════════════════════════════════════
 function goTab(id) {
+  // Safety: always ensure main app is visible and onboarding is hidden
+  var ob = document.getElementById('onboard');
+  var mainApp = document.getElementById('main-app');
+  if (ob && ob.style.display !== 'none') {
+    ob.style.display = 'none';
+  }
+  if (mainApp && mainApp.style.display !== 'flex') {
+    mainApp.style.display = 'flex';
+    mainApp.style.flexDirection = 'column';
+    mainApp.style.flex = '1';
+    mainApp.style.overflow = 'hidden';
+  }
   document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('on'); });
   document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('on'); });
-  document.getElementById('s-' + id).classList.add('on');
-  document.getElementById('tab-' + id).classList.add('on');
+  var screen = document.getElementById('s-' + id);
+  var tab = document.getElementById('tab-' + id);
+  if (screen) screen.classList.add('on');
+  if (tab) tab.classList.add('on');
   if (id === 'track') renderTracking();
   if (id === 'stack') renderStacks();
   if (id === 'research') renderResearch();
@@ -1732,61 +1710,34 @@ function saveName() {
 // ══════════════════════════════════════
 
 function showHomeNew() {
-  document.getElementById('home-new').style.display = 'flex';
-  document.getElementById('home-returning').style.display = 'none';
+  var skipRow = document.getElementById('home-skip-row');
+  if (skipRow) skipRow.style.display = 'none';
   document.getElementById('ob-next').textContent = 'Get started →';
   document.getElementById('ob-back').style.display = 'none';
+  document.getElementById('ob-prog').style.width = '12%';
 }
 
 function showHomeReturning() {
-  // Switch to home screen
   obStep = 0;
   showObScreen(0);
-  document.getElementById('ob-prog').style.width = '100%';
-
-  document.getElementById('home-new').style.display = 'none';
-  document.getElementById('home-returning').style.display = 'flex';
-
-  // Populate stats
-  var name = settings.name || 'Researcher';
-  document.getElementById('home-username').textContent = name;
-  var goalLabels = {fat_loss:'Fat loss protocol',recovery:'Recovery protocol',performance:'Performance protocol',cognitive:'Cognitive protocol',longevity:'Longevity protocol',hormonal:'Hormonal protocol'};
-  document.getElementById('home-goal-label').textContent = goalLabels[profile.goal] || 'Your protocol is ready';
-  document.getElementById('home-stat-doses').textContent = parseInt(localStorage.getItem('pin_total_logged') || '0');
-  document.getElementById('home-stat-streak').textContent = streak;
-  document.getElementById('home-stat-stacks').textContent = stacks.length;
-
-  // Show today's doses preview
-  var now = new Date();
-  var dosed = 0;
-  for (var k in todayLog) { if (todayLog[k]) dosed++; }
-  var homeToday = document.getElementById('home-today-doses');
-  if (doses.length) {
-    var remaining = doses.length - dosed;
-    var statusColor = remaining === 0 ? 'var(--teal)' : '#f59e0b';
-    var statusText = remaining === 0 ? 'All doses complete today ✓' : remaining + ' dose' + (remaining !== 1 ? 's' : '') + ' remaining today';
-    homeToday.innerHTML = '<div style="background:var(--bg3);border-radius:var(--rl);padding:14px 16px;border:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;">'
-      + '<div><div style="font-size:13px;font-weight:700;margin-bottom:2px;">Today\'s protocol</div>'
-      + '<div style="font-size:12px;color:var(--text3);">' + doses.length + ' peptide' + (doses.length !== 1 ? 's' : '') + ' scheduled</div></div>'
-      + '<div style="font-size:12px;font-weight:700;color:' + statusColor + ';text-align:right;">' + statusText + '</div>'
-      + '</div>';
-  } else {
-    homeToday.innerHTML = '';
-  }
-
-  // Button becomes "Enter PIN"
-  document.getElementById('ob-next').textContent = 'Enter PIN →';
+  var skipRow = document.getElementById('home-skip-row');
+  if (skipRow) skipRow.style.display = 'block';
+  document.getElementById('ob-next').textContent = 'Get started →';
   document.getElementById('ob-back').style.display = 'none';
-  document.getElementById('ob-prog').style.width = '100%';
+  document.getElementById('ob-prog').style.width = '12%';
 }
-
 function enterApp(tab) {
   var ob = document.getElementById('onboard');
+  var mainApp = document.getElementById('main-app');
   ob.style.transition = 'opacity 0.25s ease';
   ob.style.opacity = '0';
   setTimeout(function() {
     ob.style.display = 'none';
     ob.style.opacity = '';
+    mainApp.style.display = 'flex';
+    mainApp.style.flexDirection = 'column';
+    mainApp.style.flex = '1';
+    mainApp.style.overflow = 'hidden';
     goTab(tab || 'track');
   }, 250);
 }
@@ -1995,20 +1946,28 @@ toggleDose = function(i) {
   }
 };
 
-// Always show home screen on launch — it adapts based on user state
-updateObProgress();
+// ALWAYS show home screen on every launch — never skip it
+// Pre-render app screens silently in background
+var _mainApp = document.getElementById('main-app');
+if (_mainApp) {
+  _mainApp.style.display = 'flex';
+  _mainApp.style.flexDirection = 'column';
+  _mainApp.style.flex = '1';
+  _mainApp.style.overflow = 'hidden';
+}
+try { renderTracking(); } catch(e) {}
+try { renderResearch(); } catch(e) {}
+try { renderStacks(); } catch(e) {}
+try { renderVendors(); } catch(e) {}
+try { renderProfile(); } catch(e) {}
+
+// Show home screen — either returning or new user mode
 if (onboarded) {
-  // Pre-render all screens in background
-  try { renderTracking(); } catch(e) {}
-  try { renderResearch(); } catch(e) {}
-  try { renderStacks(); } catch(e) {}
-  try { renderVendors(); } catch(e) {}
-  try { renderProfile(); } catch(e) {}
-  // Show returning user home screen
   showHomeReturning();
 } else {
   showHomeNew();
 }
+updateObProgress();
 </script>
 </body>
 </html>
