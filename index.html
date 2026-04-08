@@ -36,16 +36,16 @@ body{font-family:'Inter',-apple-system,sans-serif;color:var(--text);font-size:15
 .ob-screen.active{transform:translateX(0);opacity:1}
 .ob-screen.left{transform:translateX(-100%);opacity:0}
 .ob-screen.right{transform:translateX(100%);opacity:0}
-.ob-logo{text-align:center;padding:40px 0 8px}
-.ob-logo-mark{font-size:48px;font-weight:900;letter-spacing:-3px;background:linear-gradient(135deg,var(--teal),#00aaff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ob-logo{text-align:center;padding:20px 0 4px}
+.ob-logo-mark{font-size:40px;font-weight:900;letter-spacing:-3px;background:linear-gradient(135deg,var(--teal),#00aaff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .ob-logo-sub{font-size:12px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
-.ob-hero{font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1.15;margin-bottom:10px;margin-top:32px}
+.ob-hero{font-size:28px;font-weight:900;letter-spacing:-1.2px;line-height:1.15;margin-bottom:10px;margin-top:16px}
 .ob-hero span{color:var(--teal)}
-.ob-desc{font-size:15px;color:var(--text2);line-height:1.65;margin-bottom:32px}
-.ob-question{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;margin-top:32px}
-.ob-hint{font-size:13px;color:var(--text2);margin-bottom:24px}
-.ob-options{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
-.ob-opt{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--rl);padding:16px 18px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all 0.2s}
+.ob-desc{font-size:15px;color:var(--text2);line-height:1.65;margin-bottom:16px}
+.ob-question{font-size:21px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px;margin-top:20px}
+.ob-hint{font-size:13px;color:var(--text2);margin-bottom:16px}
+.ob-options{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.ob-opt{background:var(--bg2);border:1.5px solid var(--border2);border-radius:var(--rl);padding:13px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all 0.2s}
 .ob-opt:active{transform:scale(0.98)}
 .ob-opt.sel{border-color:var(--teal);background:var(--tl)}
 .ob-opt-icon{font-size:24px;width:40px;text-align:center;flex-shrink:0}
@@ -64,7 +64,7 @@ body{font-family:'Inter',-apple-system,sans-serif;color:var(--text);font-size:15
 .ob-btn-next{flex:1;background:linear-gradient(135deg,var(--teal),var(--teal2));color:#000;padding:15px;border-radius:var(--r);font-size:16px;font-weight:700;border:none;cursor:pointer;font-family:inherit;transition:opacity 0.15s}
 .ob-btn-next:active{opacity:0.8}
 .ob-btn-back{width:50px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--r);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2)}
-.ob-age-input{font-size:64px;font-weight:900;color:var(--teal);text-align:center;width:100%;background:transparent;border:none;outline:none;margin:24px 0 8px;letter-spacing:-3px}
+.ob-age-input{font-size:56px;font-weight:900;color:var(--teal);text-align:center;width:100%;background:transparent;border:none;outline:none;margin:16px 0 4px;letter-spacing:-3px}
 .ob-age-label{text-align:center;font-size:13px;color:var(--text3);margin-bottom:24px}
 .ob-result{background:linear-gradient(135deg,var(--bg2),var(--bg3));border-radius:var(--rxl);padding:22px;margin-bottom:16px;border:1px solid rgba(0,214,143,0.2)}
 .ob-result-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--teal);margin-bottom:12px}
@@ -276,6 +276,47 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .beginner-note{background:var(--tl);border:1px solid rgba(0,214,143,0.25);border-radius:var(--r);padding:13px;margin-bottom:14px}
 .beginner-note-label{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
 .beginner-note-text{font-size:13px;color:var(--text);line-height:1.65}
+
+/* INJECTION SCALE */
+.inj-opt{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--bg2);border:2px solid var(--border2);border-radius:var(--rl);padding:14px 8px;cursor:pointer;transition:all 0.2s;color:var(--text3)}
+.inj-opt:active{transform:scale(0.95)}
+.inj-opt.sel{border-color:var(--teal);background:rgba(0,214,143,0.08);color:var(--teal)}
+.inj-num{font-size:18px;font-weight:800;letter-spacing:-0.5px}
+.inj-syringes{width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+.inj-desc-box{background:var(--bg3);border-radius:var(--rl);padding:14px 16px;border:0.5px solid var(--border2);min-height:72px;transition:all 0.2s}
+.inj-desc-title{font-size:15px;font-weight:700;margin-bottom:5px}
+.inj-desc-text{font-size:13px;color:var(--text2);line-height:1.6}
+
+/* INJECTION SITE TRACKER */
+.inj-tracker-wrap{position:relative;width:100%;max-width:360px;margin:0 auto}
+.inj-body-svg{width:100%;height:auto;display:block}
+.inj-zone{cursor:pointer;transition:opacity 0.2s}
+.inj-zone:active{opacity:0.7}
+.inj-dot{position:absolute;border-radius:50%;transform:translate(-50%,-50%);transition:all 0.3s;pointer-events:none;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#000}
+.inj-legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:14px}
+.inj-legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2)}
+.inj-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.inj-log-entry{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.inj-log-entry:last-child{border:none}
+.inj-log-zone{font-weight:600}
+.inj-log-time{font-size:11px;color:var(--text3)}
+.inj-zone-btn{background:var(--bg3);border:1.5px solid var(--border2);border-radius:var(--r);padding:10px 12px;cursor:pointer;transition:all 0.2s;text-align:left;width:100%}
+.inj-zone-btn:active{transform:scale(0.97)}
+.inj-zone-btn.hot{border-color:#ef4444;background:rgba(239,68,68,0.08)}
+.inj-zone-btn.warm{border-color:#f59e0b;background:rgba(245,158,11,0.08)}
+.inj-zone-btn.ready{border-color:var(--teal);background:rgba(0,214,143,0.08)}
+.inj-zone-name{font-size:13px;font-weight:600}
+.inj-zone-status{font-size:11px;margin-top:2px}
+.inj-zone-btn.hot .inj-zone-status{color:#f87171}
+.inj-zone-btn.warm .inj-zone-status{color:#fcd34d}
+.inj-zone-btn.ready .inj-zone-status{color:var(--teal)}
+
+/* CLICKABLE PEPTIDE CHIP */
+.pep-chip{display:inline;color:var(--teal);font-weight:600;cursor:pointer;border-bottom:1px dotted rgba(0,214,143,0.5);transition:all 0.15s;white-space:nowrap}
+.pep-chip:active{opacity:0.7}
+
+/* SITE LOG SHEET */
+.site-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
 </style>
 </head>
 <body>
@@ -285,24 +326,83 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
   <div class="ob-progress"><div class="ob-bar" id="ob-prog" style="width:12%"></div></div>
   <div class="ob-screens">
 
-    <!-- Step 0: Welcome -->
+    <!-- Step 0: Home screen — shown every launch -->
     <div class="ob-screen active" id="ob-0">
       <div class="ob-logo">
         <div class="ob-logo-mark">PIN</div>
         <div class="ob-logo-sub">Peptide Intelligence Network</div>
       </div>
-      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:20px;">
+
+      <!-- RETURNING USER: shown when they have a stack -->
+      <div id="home-returning" style="display:none;flex:1;flex-direction:column;justify-content:center;padding-bottom:8px;">
+        <div style="background:linear-gradient(135deg,var(--bg3),var(--bg2));border-radius:var(--rxl);padding:20px;margin-bottom:14px;border:0.5px solid rgba(0,214,143,0.2);">
+          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--teal);margin-bottom:8px;">Welcome back</div>
+          <div style="font-size:20px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px;" id="home-username">Researcher</div>
+          <div style="font-size:13px;color:var(--text2);" id="home-goal-label">Your protocol is ready</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;">
+            <div style="background:rgba(255,255,255,0.04);border-radius:var(--r);padding:10px;text-align:center;">
+              <div style="font-size:20px;font-weight:800;color:var(--teal);" id="home-stat-doses">0</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px;">Doses</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:var(--r);padding:10px;text-align:center;">
+              <div style="font-size:20px;font-weight:800;color:var(--teal);" id="home-stat-streak">0</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px;">Streak 🔥</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:var(--r);padding:10px;text-align:center;">
+              <div style="font-size:20px;font-weight:800;color:var(--teal);" id="home-stat-stacks">0</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px;">Stacks</div>
+            </div>
+          </div>
+        </div>
+        <div id="home-today-doses" style="margin-bottom:14px;"></div>
+        <div style="background:var(--bg3);border-radius:var(--rl);padding:14px 16px;border:0.5px solid var(--border);margin-bottom:14px;">
+          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.6px;color:var(--text3);margin-bottom:10px;">Quick access</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div onclick="enterApp('track')" style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:13px;cursor:pointer;text-align:center;">
+              <div style="font-size:22px;margin-bottom:4px;">💊</div>
+              <div style="font-size:12px;font-weight:600;">Track</div>
+            </div>
+            <div onclick="enterApp('stack')" style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:13px;cursor:pointer;text-align:center;">
+              <div style="font-size:22px;margin-bottom:4px;">⚗️</div>
+              <div style="font-size:12px;font-weight:600;">Stack</div>
+            </div>
+            <div onclick="enterApp('research')" style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:13px;cursor:pointer;text-align:center;">
+              <div style="font-size:22px;margin-bottom:4px;">🔬</div>
+              <div style="font-size:12px;font-weight:600;">Research</div>
+            </div>
+            <div onclick="enterApp('vendors')" style="background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);padding:13px;cursor:pointer;text-align:center;">
+              <div style="font-size:22px;margin-bottom:4px;">🏪</div>
+              <div style="font-size:12px;font-weight:600;">Vendors</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW USER: shown on first visit -->
+      <div id="home-new" style="flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:8px;">
         <div class="ob-hero">The smartest peptide companion <span>ever built.</span></div>
         <div class="ob-desc">Track your protocol, build AI-powered stacks, explore the research, and connect with the peptide community — all in one place.</div>
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px;">
-          <div style="display:flex;align-items:center;gap:12px;background:var(--bg3);border-radius:var(--r);padding:12px 14px;">
-            <span style="font-size:22px;">💊</span><div><div style="font-size:14px;font-weight:600;">Daily dose tracking</div><div style="font-size:12px;color:var(--text3);">Never miss a dose or forget when you injected</div></div>
+          <div style="display:flex;align-items:center;gap:14px;background:var(--bg3);border-radius:var(--rl);padding:14px 16px;border:0.5px solid var(--border2);">
+            <span style="font-size:26px;flex-shrink:0;">💊</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;letter-spacing:-0.2px;color:var(--text);margin-bottom:3px;">Daily Dose Tracking</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.55;font-weight:400;">Log every injection, build streaks, and never lose track of where you are in your protocol.</div>
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;background:var(--bg3);border-radius:var(--r);padding:12px 14px;">
-            <span style="font-size:22px;">🤖</span><div><div style="font-size:14px;font-weight:600;">AI stack builder</div><div style="font-size:12px;color:var(--text3);">Custom protocols built for your goals</div></div>
+          <div style="display:flex;align-items:center;gap:14px;background:var(--bg3);border-radius:var(--rl);padding:14px 16px;border:0.5px solid var(--border2);">
+            <span style="font-size:26px;flex-shrink:0;">🤖</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;letter-spacing:-0.2px;color:var(--text);margin-bottom:3px;">AI Stack Builder</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.55;font-weight:400;">Describe your goals and get a fully personalized, research-backed peptide protocol in seconds.</div>
+            </div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;background:var(--bg3);border-radius:var(--r);padding:12px 14px;">
-            <span style="font-size:22px;">🔬</span><div><div style="font-size:14px;font-weight:600;">Live research database</div><div style="font-size:12px;color:var(--text3);">40+ peptides with real PubMed studies</div></div>
+          <div style="display:flex;align-items:center;gap:14px;background:var(--bg3);border-radius:var(--rl);padding:14px 16px;border:0.5px solid var(--border2);">
+            <span style="font-size:26px;flex-shrink:0;">🔬</span>
+            <div>
+              <div style="font-size:15px;font-weight:700;letter-spacing:-0.2px;color:var(--text);margin-bottom:3px;">Live Research Database</div>
+              <div style="font-size:13px;color:var(--text2);line-height:1.55;font-weight:400;">40+ peptides documented with mechanisms, dosing, safety profiles, and real PubMed studies.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -311,10 +411,10 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
     <!-- Step 1: Age verification -->
     <div class="ob-screen right" id="ob-1">
       <div class="ob-question" style="margin-top:60px;">How old are you?</div>
-      <div class="ob-hint">You must be 21 or older to use PIN. This app contains research chemical information intended for adults only.</div>
+      <div class="ob-hint">You must be 18 or older to use PIN. This app contains research chemical information intended for adults only.</div>
       <input type="number" class="ob-age-input" id="ob-age" placeholder="25" min="18" max="99" inputmode="numeric">
       <div class="ob-age-label">years old</div>
-      <div id="ob-age-err" style="text-align:center;font-size:13px;color:#f87171;margin-bottom:12px;display:none;">You must be 21 or older to use PIN.</div>
+      <div id="ob-age-err" style="text-align:center;font-size:13px;color:#f87171;margin-bottom:12px;display:none;">You must be 18 or older to use PIN.</div>
       <div style="flex:1;"></div>
     </div>
 
@@ -346,37 +446,88 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
     <!-- Step 3: Experience level -->
     <div class="ob-screen right" id="ob-3">
-      <div class="ob-question">What's your peptide experience?</div>
-      <div class="ob-hint">Be honest — this shapes what we recommend and how we explain things to you.</div>
+      <div class="ob-question">Where are you in your peptide journey?</div>
+      <div class="ob-hint">Select the option that best describes you. This helps us calibrate recommendations and explanations to your level.</div>
       <div class="ob-options">
         <div class="ob-opt" data-val="beginner" onclick="selectOpt(this,'ob-exp')">
-          <div class="ob-opt-icon">🌱</div><div class="ob-opt-text"><div class="ob-opt-title">Complete beginner</div><div class="ob-opt-sub">Never used peptides, just getting started</div></div><div class="ob-opt-check">✓</div>
+          <div class="ob-opt-icon">🌱</div>
+          <div class="ob-opt-text">
+            <div class="ob-opt-title">New to peptides</div>
+            <div class="ob-opt-sub">Haven't used peptides yet — starting from scratch</div>
+          </div>
+          <div class="ob-opt-check">✓</div>
         </div>
         <div class="ob-opt" data-val="some" onclick="selectOpt(this,'ob-exp')">
-          <div class="ob-opt-icon">🌿</div><div class="ob-opt-text"><div class="ob-opt-title">Some experience</div><div class="ob-opt-sub">Used 1-3 peptides, understand the basics</div></div><div class="ob-opt-check">✓</div>
+          <div class="ob-opt-icon">🌿</div>
+          <div class="ob-opt-text">
+            <div class="ob-opt-title">Some experience</div>
+            <div class="ob-opt-sub">Tried 1–3 peptides and understand the fundamentals</div>
+          </div>
+          <div class="ob-opt-check">✓</div>
         </div>
         <div class="ob-opt" data-val="intermediate" onclick="selectOpt(this,'ob-exp')">
-          <div class="ob-opt-icon">🔬</div><div class="ob-opt-text"><div class="ob-opt-title">Intermediate researcher</div><div class="ob-opt-sub">Comfortable with protocols, injections, tracking</div></div><div class="ob-opt-check">✓</div>
+          <div class="ob-opt-icon">🔬</div>
+          <div class="ob-opt-text">
+            <div class="ob-opt-title">Experienced researcher</div>
+            <div class="ob-opt-sub">Run multiple protocols, comfortable with dosing and tracking</div>
+          </div>
+          <div class="ob-opt-check">✓</div>
         </div>
         <div class="ob-opt" data-val="advanced" onclick="selectOpt(this,'ob-exp')">
-          <div class="ob-opt-icon">🧬</div><div class="ob-opt-text"><div class="ob-opt-title">Advanced researcher</div><div class="ob-opt-sub">Deep knowledge, complex stacking experience</div></div><div class="ob-opt-check">✓</div>
+          <div class="ob-opt-icon">🧬</div>
+          <div class="ob-opt-text">
+            <div class="ob-opt-title">Advanced researcher</div>
+            <div class="ob-opt-sub">Deep expertise, complex stacks, and years of hands-on research</div>
+          </div>
+          <div class="ob-opt-check">✓</div>
         </div>
       </div>
     </div>
 
-    <!-- Step 4: Injection comfort -->
+    <!-- Step 4: Injection comfort 1-5 scale -->
     <div class="ob-screen right" id="ob-4">
-      <div class="ob-question">Are you comfortable with injections?</div>
-      <div class="ob-hint">This helps us recommend the right administration routes for your protocol.</div>
-      <div class="ob-options">
-        <div class="ob-opt" data-val="no" onclick="selectOpt(this,'ob-inject')">
-          <div class="ob-opt-icon">😰</div><div class="ob-opt-text"><div class="ob-opt-title">Not yet — prefer no injections</div><div class="ob-opt-sub">We'll start with oral, intranasal, or topical options</div></div><div class="ob-opt-check">✓</div>
+      <div class="ob-question">How comfortable are you with injections?</div>
+      <div class="ob-hint">This helps us recommend the right administration routes. No wrong answer — be honest.</div>
+      <div id="inject-scale" style="margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px;gap:8px;">
+          <div class="inj-opt" data-val="1" onclick="selectInject(this,1)">
+            <div class="inj-syringes">
+              <svg viewBox="0 0 32 32" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="6" width="4" height="18" rx="2" fill="currentColor" opacity="0.25"/><rect x="15.5" y="4" width="1" height="4" rx="0.5" fill="currentColor" opacity="0.4"/><circle cx="16" cy="26" r="2" fill="currentColor" opacity="0.25"/></svg>
+            </div>
+            <div class="inj-num">1</div>
+          </div>
+          <div class="inj-opt" data-val="2" onclick="selectInject(this,2)">
+            <div class="inj-syringes">
+              <svg viewBox="0 0 32 32" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="6" width="4" height="18" rx="2" fill="currentColor" opacity="0.4"/><rect x="15.5" y="4" width="1" height="4" rx="0.5" fill="currentColor" opacity="0.55"/><circle cx="16" cy="26" r="2" fill="currentColor" opacity="0.4"/></svg>
+            </div>
+            <div class="inj-num">2</div>
+          </div>
+          <div class="inj-opt" data-val="3" onclick="selectInject(this,3)">
+            <div class="inj-syringes">
+              <svg viewBox="0 0 32 32" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="6" width="4" height="18" rx="2" fill="currentColor" opacity="0.6"/><rect x="15.5" y="4" width="1" height="4" rx="0.5" fill="currentColor" opacity="0.75"/><circle cx="16" cy="26" r="2" fill="currentColor" opacity="0.6"/></svg>
+            </div>
+            <div class="inj-num">3</div>
+          </div>
+          <div class="inj-opt" data-val="4" onclick="selectInject(this,4)">
+            <div class="inj-syringes">
+              <svg viewBox="0 0 32 32" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="6" width="4" height="18" rx="2" fill="currentColor" opacity="0.8"/><rect x="15.5" y="4" width="1" height="4" rx="0.5" fill="currentColor" opacity="0.9"/><circle cx="16" cy="26" r="2" fill="currentColor" opacity="0.8"/></svg>
+            </div>
+            <div class="inj-num">4</div>
+          </div>
+          <div class="inj-opt" data-val="5" onclick="selectInject(this,5)">
+            <div class="inj-syringes">
+              <svg viewBox="0 0 32 32" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="14" y="6" width="4" height="18" rx="2" fill="currentColor"/><rect x="15.5" y="4" width="1" height="4" rx="0.5" fill="currentColor"/><circle cx="16" cy="26" r="2" fill="currentColor"/></svg>
+            </div>
+            <div class="inj-num">5</div>
+          </div>
         </div>
-        <div class="ob-opt" data-val="learning" onclick="selectOpt(this,'ob-inject')">
-          <div class="ob-opt-icon">📚</div><div class="ob-opt-text"><div class="ob-opt-title">Learning — nervous but open</div><div class="ob-opt-sub">We'll guide you through your first SubQ injection</div></div><div class="ob-opt-check">✓</div>
+        <div class="inj-desc-box" id="inj-desc">
+          <div class="inj-desc-title" id="inj-desc-title">Select your comfort level above</div>
+          <div class="inj-desc-text" id="inj-desc-text">We use this to suggest the safest and most appropriate administration routes for your protocol.</div>
         </div>
-        <div class="ob-opt" data-val="yes" onclick="selectOpt(this,'ob-inject')">
-          <div class="ob-opt-icon">💉</div><div class="ob-opt-text"><div class="ob-opt-title">Yes, comfortable with SubQ/IM</div><div class="ob-opt-sub">Full range of peptides available to you</div></div><div class="ob-opt-check">✓</div>
+        <div style="display:flex;justify-content:space-between;margin-top:10px;padding:0 4px;">
+          <div style="font-size:11px;color:var(--text3);font-weight:500;">Not yet</div>
+          <div style="font-size:11px;color:var(--text3);font-weight:500;">Daily user</div>
         </div>
       </div>
     </div>
@@ -431,6 +582,21 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
       <div class="card">
         <div class="clbl">Energy · Sleep · Body · Mood (this week)</div>
         <div class="chart-wrap" id="t-chart"></div>
+      </div>
+      <div class="shead"><h2>Injection site tracker</h2><span class="shead-a" onclick="openSh('sh-inject-log')">Log site</span></div>
+      <div class="card" id="t-inject-card">
+        <div class="clbl">Tap a zone to log — color shows recency</div>
+        <div class="inj-tracker-wrap" id="inj-tracker-body"></div>
+        <div class="inj-legend">
+          <div class="inj-legend-item"><div class="inj-legend-dot" style="background:#ef4444;"></div>Used &lt;12h ago</div>
+          <div class="inj-legend-item"><div class="inj-legend-dot" style="background:#f59e0b;"></div>Used 12–36h ago</div>
+          <div class="inj-legend-item"><div class="inj-legend-dot" style="background:var(--teal);"></div>Ready to use</div>
+          <div class="inj-legend-item"><div class="inj-legend-dot" style="background:var(--bg4);border:1px solid var(--border2);"></div>Not logged</div>
+        </div>
+      </div>
+      <div class="shead"><h2>Recent injections</h2></div>
+      <div class="card" id="t-inject-log">
+        <div style="font-size:13px;color:var(--text3);">No injections logged yet.</div>
       </div>
     </div>
   </div>
@@ -700,6 +866,31 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 </div>
 </div>
 
+<!-- INJECTION SITE LOG -->
+<div class="overlay" id="sh-inject-log" onclick="closeSh('sh-inject-log',event)">
+<div class="sheet">
+  <div class="sh-hdl"></div>
+  <div class="sh-title">Log injection site</div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">Select the zone you just injected. PIN tracks rest windows and warns you if a site needs more recovery time.</div>
+  <div class="field"><label>Peptide injected</label>
+    <select id="inj-pep-select">
+      <option value="">Select peptide...</option>
+      <option>BPC-157</option><option>TB-500</option><option>CJC-1295</option><option>Ipamorelin</option><option>Semaglutide</option><option>Tirzepatide</option><option>Retatrutide</option><option>Epithalon</option><option>PT-141</option><option>Thymalin</option><option>SS-31</option><option>MOTS-c</option><option>Other</option>
+    </select>
+  </div>
+  <div class="field"><label>Route</label>
+    <select id="inj-route-select">
+      <option value="SubQ">SubQ (subcutaneous)</option>
+      <option value="IM">IM (intramuscular)</option>
+    </select>
+  </div>
+  <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">Select injection zone</div>
+  <div class="site-grid" id="inj-site-grid"></div>
+  <button class="btn btn-p" onclick="logInjectionSite()">Log this injection</button>
+  <button class="btn btn-o" onclick="closeSh('sh-inject-log',null)">Cancel</button>
+</div>
+</div>
+
 <script>
 // ══════════════════════════════════════
 // STATE
@@ -719,6 +910,7 @@ var rvRating = 0;
 var selectedPepDetail = null;
 var obStep = 0;
 var obAnswers = {goal:'', exp:'', inject:''};
+var injectLevel = 0;
 var onboarded = localStorage.getItem('pin_onboarded') === '1';
 
 function save() {
@@ -748,6 +940,7 @@ function toast(msg) {
 function openSh(id) {
   document.getElementById(id).classList.add('on');
   if (id === 'sh-journal') buildJournalMetrics();
+  if (id === 'sh-inject-log') buildInjSiteGrid();
 }
 
 function closeSh(id, e) {
@@ -768,7 +961,7 @@ function updateObProgress() {
   if (obStep === OB_STEPS - 1) {
     nextBtn.textContent = 'Enter PIN →';
   } else if (obStep === 0) {
-    nextBtn.textContent = 'Get started →';
+    nextBtn.textContent = onboarded ? 'Enter PIN →' : 'Get started →';
   } else {
     nextBtn.textContent = 'Continue →';
   }
@@ -787,14 +980,37 @@ function selectOpt(el, key) {
   obAnswers[key] = el.getAttribute('data-val');
 }
 
+var INJ_LABELS = {
+  1: {title:"No experience yet", text:"No problem. We will only recommend oral, intranasal, or topical peptides. No injections needed to get started.", val:"no"},
+  2: {title:"Aware but not tried yet", text:"You know injections exist but have not done one yet. We will show you beginner-safe routes and guide you through SubQ when you are ready.", val:"aware"},
+  3: {title:"Learning — nervous but open", text:"You have tried or are open to SubQ injections. We will include subcutaneous options with clear guidance and beginner-friendly protocols.", val:"learning"},
+  4: {title:"Comfortable with SubQ", text:"You regularly self-administer subcutaneous injections. Full range of SubQ and intranasal peptides available to you.", val:"subq"},
+  5: {title:"Use injections regularly", text:"Experienced with SubQ and IM injections. All administration routes unlocked — full peptide library available.", val:"yes"}
+};
+
+function selectInject(el, level) {
+  document.querySelectorAll('.inj-opt').forEach(function(o) { o.classList.remove('sel'); });
+  el.classList.add('sel');
+  injectLevel = level;
+  var info = INJ_LABELS[level];
+  document.getElementById('inj-desc-title').textContent = info.title;
+  document.getElementById('inj-desc-text').textContent = info.text;
+  obAnswers['ob-inject'] = info.val;
+  document.getElementById('inj-desc').style.borderColor = 'rgba(0,214,143,0.3)';
+}
+
 function obNext() {
   if (obStep === 0) {
+    if (onboarded) {
+      enterApp('track');
+      return;
+    }
     obStep = 1; showObScreen(1); updateObProgress(); return;
   }
   if (obStep === 1) {
     var age = parseInt(document.getElementById('ob-age').value);
     document.getElementById('ob-age-err').style.display = 'none';
-    if (!age || age < 21) { document.getElementById('ob-age-err').style.display = 'block'; return; }
+    if (!age || age < 18) { document.getElementById('ob-age-err').style.display = 'block'; return; }
     profile.age = age;
     obStep = 2; showObScreen(2); updateObProgress(); return;
   }
@@ -810,26 +1026,35 @@ function obNext() {
     obStep = 4; showObScreen(4); updateObProgress(); return;
   }
   if (obStep === 4) {
-    if (!obAnswers['ob-inject']) { toast('Please select your injection comfort'); return; }
-    profile.inject = obAnswers['ob-inject'];
+    if (!injectLevel) { toast('Please select your injection comfort level (1-5)'); return; }
+    profile.inject = obAnswers['ob-inject'] || 'learning';
+    profile.injectLevel = injectLevel;
     obStep = 5; showObScreen(5); updateObProgress();
     buildObStack();
     return;
   }
   if (obStep === 5) {
-    localStorage.setItem('pin_onboarded', '1');
-    save();
-    document.getElementById('onboard').style.display = 'none';
-    renderTracking();
-    renderResearch();
-    renderStacks();
-    renderVendors();
-    renderProfile();
+    try {
+      localStorage.setItem('pin_onboarded', '1');
+      profile.onboarded = true;
+      save();
+    } catch(e) {}
+    try { renderTracking(); } catch(e) {}
+    try { renderResearch(); } catch(e) {}
+    try { renderStacks(); } catch(e) {}
+    try { renderVendors(); } catch(e) {}
+    try { renderProfile(); } catch(e) {}
+    showHomeReturning();
+    return;
   }
 }
 
 function obBack() {
-  if (obStep > 0) { obStep--; showObScreen(obStep); updateObProgress(); }
+  if (obStep > 0) {
+    obStep--;
+    showObScreen(obStep);
+    updateObProgress();
+  }
 }
 
 var OB_STACKS = {
@@ -879,7 +1104,7 @@ var CAT_COLORS = {
 
 function buildObStack() {
   var goal = profile.goal || 'recovery';
-  var noInject = profile.inject === 'no';
+  var noInject = profile.injectLevel <= 1;
   var stack = OB_STACKS[goal] || OB_STACKS['recovery'];
   var filtered = stack.filter(function(p) { return !noInject || p.noInject; });
   if (!filtered.length) filtered = OB_STACKS['cognitive'];
@@ -971,7 +1196,7 @@ function renderTracking() {
       var done = todayLog[i] ? true : false;
       html += '<div class="dose-item' + (done ? ' done' : '') + '">';
       html += '<div class="dose-check' + (done ? ' ck' : '') + '" onclick="toggleDose(' + i + ')">' + (done ? '✓' : '') + '</div>';
-      html += '<div class="dose-body"><div class="dose-name">' + d.pep + '</div>';
+      html += '<div class="dose-body"><div class="dose-name">' + linkPeptideNames(d.pep) + '</div>';
       html += '<div class="dose-meta">' + d.amt + ' ' + d.unit + ' · ' + d.route + (d.notes ? ' · ' + d.notes : '') + '</div>';
       html += '<div class="dose-time ' + (done ? '' : 'due') + '">' + (done ? '✓ Logged today' : '⏰ ' + d.time) + '</div></div>';
       html += '<div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;">';
@@ -984,6 +1209,8 @@ function renderTracking() {
 
   // Chart
   renderChart();
+  // Injection tracker
+  renderInjTracker();
 }
 
 function toggleDose(i) {
@@ -1139,7 +1366,7 @@ function renderStacks() {
     stacks.forEach(function(s, i) {
       html += '<div class="stack-card" onclick="void(0)">';
       html += '<div class="stack-card-head"><div class="stack-name">' + s.name + '</div><div style="font-size:13px;color:var(--text3);">' + (s.created || '') + '</div></div>';
-      html += '<div class="stack-peptides">' + (s.peptides || []).slice(0,3).join('<br>') + '</div>';
+      html += '<div class="stack-peptides">' + (s.peptides || []).slice(0,3).map(linkPeptideNames).join('<br>') + '</div>';
       html += '<div style="display:flex;justify-content:space-between;margin-top:10px;">';
       html += '<button class="btn btn-p btn-sm" onclick="loadStack(' + i + ')">Load into tracker</button>';
       html += '<button class="btn btn-danger btn-sm" onclick="deleteStack(' + i + ')">Delete</button>';
@@ -1156,7 +1383,7 @@ function renderStacks() {
     chtml += '<div class="stack-tags">';
     s.tags.forEach(function(t) { chtml += '<span class="badge bg">' + t + '</span>'; });
     chtml += '</div>';
-    chtml += '<div class="stack-peptides">' + s.peptides.slice(0,3).join('<br>') + '</div>';
+    chtml += '<div class="stack-peptides">' + s.peptides.slice(0,3).map(linkPeptideNames).join('<br>') + '</div>';
     chtml += '<div class="stack-meta"><span>' + s.uses.toLocaleString() + ' researchers</span></div>';
     if (s.notes) chtml += '<div style="font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5;">' + s.notes + '</div>';
     chtml += '<button class="btn btn-p btn-sm" style="margin-top:12px;" onclick="loadCommunityStack(' + i + ')">Use this stack</button>';
@@ -1235,7 +1462,7 @@ async function buildStack() {
     var reply = data.content ? data.content.map(function(b){return b.text||'';}).join('') : 'Could not generate stack. Please try again.';
 
     document.getElementById('sb-result').style.display = 'block';
-    document.getElementById('sb-result-content').innerHTML = reply.replace(/\n/g,'<br>');
+    document.getElementById('sb-result-content').innerHTML = linkPeptideNames(reply).replace(/\n/g,'<br>');
 
     // Save the stack
     var goalLabels = {fat_loss:'Fat Loss',recovery:'Recovery',performance:'Performance',cognitive:'Cognitive',longevity:'Longevity',hormonal:'Hormonal'};
@@ -1442,7 +1669,7 @@ function renderVendors() {
     }
     html += '<div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:10px;">' + v.desc + '</div>';
     v.reviewsList.slice(0,2).forEach(function(r) {
-      html += '<div class="vendor-review">"' + r.text + '"<div class="review-author">— ' + r.user + ' · ' + '★'.repeat(r.rating) + '</div></div>';
+      html += '<div class="vendor-review">"' + linkPeptideNames(r.text) + '"<div class="review-author">— ' + r.user + ' · ' + '★'.repeat(r.rating) + '</div></div>';
     });
     html += '</div>';
   });
@@ -1501,6 +1728,257 @@ function saveName() {
 }
 
 // ══════════════════════════════════════
+// HOME SCREEN LOGIC
+// ══════════════════════════════════════
+
+function showHomeNew() {
+  document.getElementById('home-new').style.display = 'flex';
+  document.getElementById('home-returning').style.display = 'none';
+  document.getElementById('ob-next').textContent = 'Get started →';
+  document.getElementById('ob-back').style.display = 'none';
+}
+
+function showHomeReturning() {
+  // Switch to home screen
+  obStep = 0;
+  showObScreen(0);
+  document.getElementById('ob-prog').style.width = '100%';
+
+  document.getElementById('home-new').style.display = 'none';
+  document.getElementById('home-returning').style.display = 'flex';
+
+  // Populate stats
+  var name = settings.name || 'Researcher';
+  document.getElementById('home-username').textContent = name;
+  var goalLabels = {fat_loss:'Fat loss protocol',recovery:'Recovery protocol',performance:'Performance protocol',cognitive:'Cognitive protocol',longevity:'Longevity protocol',hormonal:'Hormonal protocol'};
+  document.getElementById('home-goal-label').textContent = goalLabels[profile.goal] || 'Your protocol is ready';
+  document.getElementById('home-stat-doses').textContent = parseInt(localStorage.getItem('pin_total_logged') || '0');
+  document.getElementById('home-stat-streak').textContent = streak;
+  document.getElementById('home-stat-stacks').textContent = stacks.length;
+
+  // Show today's doses preview
+  var now = new Date();
+  var dosed = 0;
+  for (var k in todayLog) { if (todayLog[k]) dosed++; }
+  var homeToday = document.getElementById('home-today-doses');
+  if (doses.length) {
+    var remaining = doses.length - dosed;
+    var statusColor = remaining === 0 ? 'var(--teal)' : '#f59e0b';
+    var statusText = remaining === 0 ? 'All doses complete today ✓' : remaining + ' dose' + (remaining !== 1 ? 's' : '') + ' remaining today';
+    homeToday.innerHTML = '<div style="background:var(--bg3);border-radius:var(--rl);padding:14px 16px;border:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;">'
+      + '<div><div style="font-size:13px;font-weight:700;margin-bottom:2px;">Today\'s protocol</div>'
+      + '<div style="font-size:12px;color:var(--text3);">' + doses.length + ' peptide' + (doses.length !== 1 ? 's' : '') + ' scheduled</div></div>'
+      + '<div style="font-size:12px;font-weight:700;color:' + statusColor + ';text-align:right;">' + statusText + '</div>'
+      + '</div>';
+  } else {
+    homeToday.innerHTML = '';
+  }
+
+  // Button becomes "Enter PIN"
+  document.getElementById('ob-next').textContent = 'Enter PIN →';
+  document.getElementById('ob-back').style.display = 'none';
+  document.getElementById('ob-prog').style.width = '100%';
+}
+
+function enterApp(tab) {
+  var ob = document.getElementById('onboard');
+  ob.style.transition = 'opacity 0.25s ease';
+  ob.style.opacity = '0';
+  setTimeout(function() {
+    ob.style.display = 'none';
+    ob.style.opacity = '';
+    goTab(tab || 'track');
+  }, 250);
+}
+
+// ══════════════════════════════════════
+// INJECTION SITE TRACKER
+// ══════════════════════════════════════
+
+var injectionLog = JSON.parse(localStorage.getItem('pin_inject_log') || '[]');
+
+var INJ_ZONES = [
+  {id:'abd-r-upper', label:'Abdomen R Upper', restH:24},
+  {id:'abd-l-upper', label:'Abdomen L Upper', restH:24},
+  {id:'abd-r-lower', label:'Abdomen R Lower', restH:24},
+  {id:'abd-l-lower', label:'Abdomen L Lower', restH:24},
+  {id:'thigh-r',     label:'Right Thigh',     restH:48},
+  {id:'thigh-l',     label:'Left Thigh',      restH:48},
+  {id:'glute-r',     label:'Right Glute',     restH:48},
+  {id:'glute-l',     label:'Left Glute',      restH:48},
+  {id:'delt-r',      label:'Right Deltoid',   restH:48},
+  {id:'delt-l',      label:'Left Deltoid',    restH:48},
+];
+
+var ZONE_SVG_POS = {
+  'abd-r-upper': {x:42, y:80},
+  'abd-l-upper': {x:58, y:80},
+  'abd-r-lower': {x:42, y:97},
+  'abd-l-lower': {x:58, y:97},
+  'thigh-r':     {x:40, y:155},
+  'thigh-l':     {x:60, y:155},
+  'glute-r':     {x:140, y:130},
+  'glute-l':     {x:160, y:130},
+  'delt-r':      {x:128, y:65},
+  'delt-l':      {x:172, y:65},
+};
+
+var selectedInjZone = null;
+
+function getZoneStatus(zoneId) {
+  var now = Date.now();
+  var recent = injectionLog.filter(function(e) { return e.zone === zoneId; });
+  if (!recent.length) return {state:'unused', hoursAgo: null};
+  var last = recent.reduce(function(a,b) { return a.ts > b.ts ? a : b; });
+  var hoursAgo = (now - last.ts) / 3600000;
+  var zone = INJ_ZONES.find(function(z) { return z.id === zoneId; });
+  var restH = zone ? zone.restH : 24;
+  if (hoursAgo < 12) return {state:'hot', hoursAgo: hoursAgo, last: last};
+  if (hoursAgo < restH) return {state:'warm', hoursAgo: hoursAgo, last: last};
+  return {state:'ready', hoursAgo: hoursAgo, last: last};
+}
+
+function renderInjTracker() {
+  var wrap = document.getElementById('inj-tracker-body');
+  if (!wrap) return;
+  var svg = '<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" class="inj-body-svg">';
+  var fx = 50;
+  svg += '<ellipse cx="' + fx + '" cy="20" rx="12" ry="14" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<rect x="' + (fx-4) + '" y="33" width="8" height="7" rx="2" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<path d="M' + (fx-18) + ' 40 Q' + (fx-20) + ' 55 ' + (fx-16) + ' 90 Q' + (fx-14) + ' 105 ' + (fx-12) + ' 115 L' + (fx+12) + ' 115 Q' + (fx+14) + ' 105 ' + (fx+16) + ' 90 Q' + (fx+20) + ' 55 ' + (fx+18) + ' 40 Z" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<path d="M' + (fx-18) + ' 42 Q' + (fx-28) + ' 50 ' + (fx-26) + ' 75 L' + (fx-22) + ' 95" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<path d="M' + (fx+18) + ' 42 Q' + (fx+28) + ' 50 ' + (fx+26) + ' 75 L' + (fx+22) + ' 95" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<path d="M' + (fx-12) + ' 115 Q' + (fx-20) + ' 118 ' + (fx-18) + ' 125 L' + (fx+18) + ' 125 Q' + (fx+20) + ' 118 ' + (fx+12) + ' 115 Z" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<path d="M' + (fx-14) + ' 125 Q' + (fx-16) + ' 150 ' + (fx-14) + ' 175 L' + (fx-10) + ' 205" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<path d="M' + (fx+14) + ' 125 Q' + (fx+16) + ' 150 ' + (fx+14) + ' 175 L' + (fx+10) + ' 205" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<text x="' + fx + '" y="220" text-anchor="middle" font-size="8" fill="#475569" font-family="Inter,sans-serif" font-weight="600">FRONT</text>';
+  var bx = 150;
+  svg += '<ellipse cx="' + bx + '" cy="20" rx="12" ry="14" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<rect x="' + (bx-4) + '" y="33" width="8" height="7" rx="2" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<path d="M' + (bx-18) + ' 40 Q' + (bx-20) + ' 55 ' + (bx-16) + ' 90 Q' + (bx-14) + ' 105 ' + (bx-12) + ' 115 L' + (bx+12) + ' 115 Q' + (bx+14) + ' 105 ' + (bx+16) + ' 90 Q' + (bx+20) + ' 55 ' + (bx+18) + ' 40 Z" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<line x1="' + bx + '" y1="42" x2="' + bx + '" y2="112" stroke="#334155" stroke-width="0.75" stroke-dasharray="2,2"/>';
+  svg += '<path d="M' + (bx-18) + ' 42 Q' + (bx-28) + ' 50 ' + (bx-26) + ' 75 L' + (bx-22) + ' 95" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<path d="M' + (bx+18) + ' 42 Q' + (bx+28) + ' 50 ' + (bx+26) + ' 75 L' + (bx+22) + ' 95" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<path d="M' + (bx-12) + ' 115 Q' + (bx-20) + ' 118 ' + (bx-18) + ' 125 L' + (bx+18) + ' 125 Q' + (bx+20) + ' 118 ' + (bx+12) + ' 115 Z" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<path d="M' + (bx-14) + ' 125 Q' + (bx-16) + ' 150 ' + (bx-14) + ' 175 L' + (bx-10) + ' 205" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<path d="M' + (bx+14) + ' 125 Q' + (bx+16) + ' 150 ' + (bx+14) + ' 175 L' + (bx+10) + ' 205" fill="none" stroke="#334155" stroke-width="1.5"/>';
+  svg += '<text x="' + bx + '" y="220" text-anchor="middle" font-size="8" fill="#475569" font-family="Inter,sans-serif" font-weight="600">BACK</text>';
+
+  INJ_ZONES.forEach(function(zone) {
+    var pos = ZONE_SVG_POS[zone.id];
+    if (!pos) return;
+    var status = getZoneStatus(zone.id);
+    var fc, sc;
+    if (status.state === 'hot')    { fc = '#ef4444'; sc = '#dc2626'; }
+    else if (status.state === 'warm')  { fc = '#f59e0b'; sc = '#d97706'; }
+    else if (status.state === 'ready') { fc = '#00d68f'; sc = '#00b377'; }
+    else { fc = '#1e293b'; sc = '#334155'; }
+    svg += '<circle cx="' + pos.x + '" cy="' + pos.y + '" r="7" fill="' + fc + '" stroke="' + sc + '" stroke-width="1.5" opacity="0.9" onclick="quickLogZone(' + "'" + zone.id + "'" + ')" style="cursor:pointer;"/>';
+    if (status.state !== 'unused') {
+      var hrs = Math.round(status.hoursAgo);
+      svg += '<text x="' + pos.x + '" y="' + (pos.y + 3.5) + '" text-anchor="middle" font-size="5.5" fill="#000" font-family="Inter,sans-serif" font-weight="700" pointer-events="none">' + hrs + 'h</text>';
+    }
+  });
+  svg += '</svg>';
+  wrap.innerHTML = svg;
+
+  var logEl = document.getElementById('t-inject-log');
+  if (!logEl) return;
+  if (!injectionLog.length) {
+    logEl.innerHTML = '<div style="font-size:13px;color:var(--text3);">No injections logged yet. Tap a zone above or use Log Site.</div>';
+    return;
+  }
+  var recent = injectionLog.slice(0,8);
+  var logHtml = '';
+  recent.forEach(function(e) {
+    var zone = INJ_ZONES.find(function(z) { return z.id === e.zone; });
+    var zoneName = zone ? zone.label : e.zone;
+    var hoursAgo = Math.round((Date.now() - e.ts) / 3600000);
+    var timeStr = hoursAgo < 1 ? 'Just now' : hoursAgo + 'h ago';
+    logHtml += '<div class="inj-log-entry"><div><div class="inj-log-zone">' + (e.peptide || 'Unknown') + '</div><div style="font-size:12px;color:var(--text2);">' + zoneName + ' · ' + (e.route || 'SubQ') + '</div></div><div class="inj-log-time">' + timeStr + '</div></div>';
+  });
+  logEl.innerHTML = logHtml;
+}
+
+function buildInjSiteGrid() {
+  var grid = document.getElementById('inj-site-grid');
+  if (!grid) return;
+  selectedInjZone = null;
+  var html = '';
+  INJ_ZONES.forEach(function(zone) {
+    var status = getZoneStatus(zone.id);
+    var cls = 'inj-zone-btn ';
+    var statusText = '';
+    if (status.state === 'hot')        { cls += 'hot';   statusText = 'Used ' + Math.round(status.hoursAgo) + 'h ago — rest needed'; }
+    else if (status.state === 'warm')  { cls += 'warm';  statusText = 'Used ' + Math.round(status.hoursAgo) + 'h ago — almost ready'; }
+    else if (status.state === 'ready') { cls += 'ready'; statusText = 'Ready to use'; }
+    else                               { cls += 'ready'; statusText = 'Never used — ready'; }
+    html += '<button class="' + cls + '" onclick="selectInjZone(' + "'" + zone.id + "'" + ')" id="izb-' + zone.id + '"><div class="inj-zone-name">' + zone.label + '</div><div class="inj-zone-status">' + statusText + '</div></button>';
+  });
+  grid.innerHTML = html;
+}
+
+function selectInjZone(zoneId) {
+  selectedInjZone = zoneId;
+  document.querySelectorAll('.inj-zone-btn').forEach(function(b) { b.style.outline = ''; });
+  var btn = document.getElementById('izb-' + zoneId);
+  if (btn) btn.style.outline = '2px solid var(--teal)';
+}
+
+function quickLogZone(zoneId) {
+  selectedInjZone = zoneId;
+  openSh('sh-inject-log');
+  setTimeout(function() { selectInjZone(zoneId); }, 80);
+}
+
+function logInjectionSite() {
+  if (!selectedInjZone) { toast('Please select an injection zone'); return; }
+  var pep = document.getElementById('inj-pep-select').value;
+  var route = document.getElementById('inj-route-select').value;
+  var zone = INJ_ZONES.find(function(z) { return z.id === selectedInjZone; });
+  var status = getZoneStatus(selectedInjZone);
+  if (status.state === 'hot') {
+    if (!confirm('Warning: ' + (zone ? zone.label : selectedInjZone) + ' was used ' + Math.round(status.hoursAgo) + 'h ago. Injecting too frequently can cause tissue damage. Continue?')) return;
+  }
+  injectionLog.unshift({zone: selectedInjZone, peptide: pep || 'Unknown', route: route, ts: Date.now()});
+  localStorage.setItem('pin_inject_log', JSON.stringify(injectionLog));
+  closeSh('sh-inject-log', null);
+  renderInjTracker();
+  toast('✓ ' + (zone ? zone.label : selectedInjZone) + ' logged');
+  selectedInjZone = null;
+}
+
+// ══════════════════════════════════════
+// CLICKABLE PEPTIDE NAMES
+// ══════════════════════════════════════
+
+var ALL_PEP_NAMES = ['BPC-157','TB-500','GHK-Cu','KPV','LL-37','Larazotide','CJC-1295','Ipamorelin','Sermorelin','GHRP-6','GHRP-2','Hexarelin','MK-677','AOD-9604','IGF-1 LR3','PEG-MGF','Follistatin 344','Semaglutide','Tirzepatide','Retatrutide','Liraglutide','MOTS-c','Humanin','Semax','Selank','Semax N-Acetyl','Selank N-Acetyl','Dihexa','Cerebrolysin','P21','Pinealon','Epithalon','Thymalin','Thymosin Alpha-1','DSIP','SS-31','PT-141','Kisspeptin-10','Oxytocin','Melanotan II','AICAR','VIP','Gonadorelin'];
+
+var PEP_REGEX_CACHE = null;
+function getPepRegex() {
+  if (PEP_REGEX_CACHE) return PEP_REGEX_CACHE;
+  var sorted = ALL_PEP_NAMES.slice().sort(function(a,b) { return b.length - a.length; });
+  var escaped = sorted.map(function(n) { return n.replace(/[-\/^$*+?.()|[\]{}]/g, '\\$&'); });
+  PEP_REGEX_CACHE = new RegExp('(' + escaped.join('|') + ')', 'g');
+  return PEP_REGEX_CACHE;
+}
+
+function linkPeptideNames(text) {
+  if (!text) return text;
+  var re = getPepRegex();
+  return text.replace(re, function(match) {
+    return '<span class="pep-chip" onclick="showPepDetailByName(\'' + match + '\')">' + match + '</span>';
+  });
+}
+
+function showPepDetailByName(name) {
+  var idx = -1;
+  for (var i = 0; i < PEPTIDES.length; i++) { if (PEPTIDES[i].name === name) { idx = i; break; } }
+  if (idx > -1) { showPepDetail(idx, name); }
+  else { toast('Research data coming soon for ' + name); }
+}
+
+// ══════════════════════════════════════
 // INIT
 // ══════════════════════════════════════
 if ('serviceWorker' in navigator) {
@@ -1517,15 +1995,19 @@ toggleDose = function(i) {
   }
 };
 
+// Always show home screen on launch — it adapts based on user state
+updateObProgress();
 if (onboarded) {
-  document.getElementById('onboard').style.display = 'none';
-  renderTracking();
-  renderResearch();
-  renderStacks();
-  renderVendors();
-  renderProfile();
+  // Pre-render all screens in background
+  try { renderTracking(); } catch(e) {}
+  try { renderResearch(); } catch(e) {}
+  try { renderStacks(); } catch(e) {}
+  try { renderVendors(); } catch(e) {}
+  try { renderProfile(); } catch(e) {}
+  // Show returning user home screen
+  showHomeReturning();
 } else {
-  updateObProgress();
+  showHomeNew();
 }
 </script>
 </body>
